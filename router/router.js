@@ -1,9 +1,18 @@
 const Router = require('express').Router;
 const productController = require('../controllers/Product');
+const userController = require('../controllers/User');
 const router = new Router();
 
 router.post('/seller', productController.sellers);
 router.post('/order', productController.order);
 router.post('/report', productController.reportSeller);
+router.post('/analyze', productController.analyze);
+
+router.post('/register', userController.register);
+router.post('/login', userController.login);
+router.post('/logout', userController.logout);
+router.post('/refresh', userController.refresh);
+router.post('/getUser', userController.getUser);
+router.post('/updateProfile', userController.updateProfile);
 
 module.exports = router;
