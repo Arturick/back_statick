@@ -57,6 +57,13 @@ class User {
         return answer[0];
     }
 
+    async deleteUserSaves(task1){
+        let sqlScript = `DELETE update_data WHERE task1 = ${task1}`;
+        let answer = await connection.query(sqlScript);
+
+        return answer[0];
+    }
+
 }
 
 module.exports = new User();

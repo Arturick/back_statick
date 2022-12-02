@@ -28,11 +28,11 @@ class product{
                 let date = String(i['date']).split('T')[0];
                 products.push({});
 
-                products[products.length - 1]['img'] = `https://images.wbstatic.net/c246x328/new/${i['supplierArticle'].slice(0, 4)}0000/${i['supplierArticle']}-1.jpg`
-                products[products.length - 1]['discountPercent'] = i['discountPercent'];
+                products[products.length - 1]['img'] = `https://images.wbstatic.net/c246x328/new/${String(i['supplierArticle']).slice(0, 4)}0000/${String(i['supplierArticle'])['supplierArticle']}-1.jpg`
+                products[products.length - 1]['discount'] = i['discountPercent'];
                 products[products.length - 1]['naming'] = i['subject'];
                 products[products.length - 1]['brand'] = i['brand'];
-                products[products.length - 1]['price'] += Math.round(+i['priceWithDisc']);
+                products[products.length - 1]['price'] += Math.round(+i['totalPrice']);
                 products[products.length - 1]['article'] = i['supplierArticle'];
                 products[products.length - 1]['date'] = date;
             });
@@ -70,7 +70,7 @@ class product{
             response.data.map(async i => {
 
                 products.push({});
-                products[products.length - 1]['img'] = `https://images.wbstatic.net/c246x328/new/${i['supplierArticle'].slice(0, 4)}0000/${i['supplierArticle']}-1.jpg`
+                products[products.length - 1]['img'] = `https://images.wbstatic.net/c246x328/new/${String(i['supplierArticle']).slice(0, 4)}0000/${String(i['supplierArticle'])}-1.jpg`
                 products[products.length - 1]['price'] = Math.round(+i['totalPrice']);
                 products[products.length - 1]['brand'] = i['brand'];
                 products[products.length - 1]['naming'] = i['subject'];
@@ -177,6 +177,13 @@ class product{
         return answer;
     }
 
+    async addMinusMoney(task1, type, value, access){
+        if(!task1  | !type | !value){
+            throw apiError.BadRequest(errorText.reqData);
+        }
+
+        //await productDB.
+    }
 }
 
 module.exports = new product();

@@ -80,8 +80,12 @@ class User {
         if(isLog.payload != +task1){
             throw apiError.BadRequest(errorText.reqData);
         }
+        let userNow = await userDB.getUserByTask1(task1);
+        userNow = userNow[0];
         await userDB.updateProfile(task1, profile);
-
+        if(profile.token != userNow.token){
+            await userDB.deleteUserSaves(task1);
+        }
         return {};
     }
 

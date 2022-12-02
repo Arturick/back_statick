@@ -81,7 +81,9 @@ class Product {
         answer['cnt'] = answer['cnt'][0];
         return answer;
     }
-
+    // async addMinus(task1, value, type){
+    //     let
+    // }
     async clear(task1, type){
         let sqlScript = ``;
         switch (type) {
