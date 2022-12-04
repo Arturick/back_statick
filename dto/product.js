@@ -59,7 +59,7 @@ class Product {
         answer['cnt'] = answer['cnt'][0];
         return answer;
     }
-q    async getSeller(task1, type){
+    async getSeller(task1, type){
         let sqlScript = `SELECT *, COUNT(*) as cnt, SUM(price) as total FROM seller WHERE task1 = ${task1} and date_seller > DATE_SUB(NOW(), INTERVAL ${dataType[type]} HOUR) GROUP by article, date_seller`;
         let answer = {};
         answer['products'] = await connection.query(sqlScript);
