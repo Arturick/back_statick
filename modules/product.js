@@ -219,7 +219,7 @@ class product{
         // if(isLog.payload != task1){
         //     throw apiError.BadRequest(errorText.reqData);
         // }
-        let driver = await new Builder().forBrowser(Browser.EDGE).build();
+        let driver = await new Builder().forBrowser(Browser.CHROME).build();
         await driver.get('https://app.shopstat.ru/auth/login-by-email');
         await sleep(600);
 
@@ -269,7 +269,7 @@ class product{
         // if(isLog.payload){
         //   //  throw apiError.BadRequest(errorText.reqData);
         // }
-        let driver = await new Builder().forBrowser(Browser.EDGE).build();
+        let driver = await new Builder().forBrowser(Browser.CHROME).build();
         await driver.get('https://app.shopstat.ru/auth/login-by-email');
         await sleep(600);
 
