@@ -6,7 +6,10 @@ const router = new Router();
 router.post('/seller', productController.sellers);
 router.post('/order', productController.order);
 router.post('/report', productController.reportSeller);
-router.post('/analyze', productController.analyze);
+router.post('/getCompetition', productController.getCompetition);
+router.post('/getAnalyze', productController.getAnalyze);
+router.post('/getByArticle', productController.getByArticle);
+router.get('/testReport', productController.testReport);
 
 router.post('/register', userController.register);
 router.post('/login', userController.login);

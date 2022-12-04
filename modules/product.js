@@ -5,12 +5,21 @@ const errorText = require('../src/answer').error;
 const productService = require('../service/Product');
 const userDB = require('../dto/user');
 const productDB = require('../dto/product');
+const {Builder, Browser, By, Key, until} = require('selenium-webdriver');
+const tokenService = require('../service/Token');
 
 let answer = [];
-
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 class product{
     async seller(dateFrom, flag = false, type = 0, access, task1, article = false, date = false){
         if(!dateFrom){
+            throw apiError.BadRequest(errorText.reqData);
+        }
+        let isLog = tokenService.validateAccessToken(access)
+        console.log(isLog.payload);
+        if(isLog.payload != task1){
             throw apiError.BadRequest(errorText.reqData);
         }
         let token = await userDB.getUserByTask1(task1);
@@ -59,6 +68,11 @@ class product{
         if(!dateFrom){
             throw apiError.BadRequest(errorText.reqData);
         }
+        let isLog = tokenService.validateAccessToken(access)
+        console.log(isLog.payload);
+        if(isLog.payload != task1){
+            throw apiError.BadRequest(errorText.reqData);
+        }
         let token = await userDB.getUserByTask1(task1);
         let lasUpdates = await userDB.getUserSaves (2, task1);
         token = token[0]['token'];
@@ -97,7 +111,11 @@ class product{
         if(!type){
             throw apiError.BadRequest(errorText.reqData);
         }
-
+        // let isLog = tokenService.validateAccessToken(access)
+        // console.log(access);
+        // if(isLog.payload != task1){
+        //     throw apiError.BadRequest(errorText.reqData);
+        // }
         let token = await userDB.getUserByTask1(task1);
         let lasUpdates = await userDB.getUserSaves( 3, task1);
         token = token[0]['token'];
@@ -112,7 +130,7 @@ class product{
             response.data.map(async i => {
                 products.push({});
                 let nm_id = String(i['nm_id']);
-                console.log(i);
+                console.log(i);//penalty
                 products[products.length - 1]['date'] = String(i['date_to']).replace('T', ' ').split(' ')[0];
                 products[products.length - 1]['brand'] = i['brand_name'];
                 products[products.length - 1]['article'] = nm_id;
@@ -125,7 +143,7 @@ class product{
                 products[products.length - 1]['price'] = +i['ppvz_for_pay'];
                 products[products.length - 1]['img'] = `https://images.wbstatic.net/c246x328/new/${nm_id.slice(0, 4)}0000/${nm_id}-1.jpg`
                 products[products.length - 1]['discount'] = i['product_discount_for_report'];
-
+                products[products.length - 1]['penalty'] = i['penalty'];
 
             });
             await productDB.addAnalyze(task1, products);
@@ -144,6 +162,11 @@ class product{
 
     async analyze(token, article){
         if(!article){
+            throw apiError.BadRequest(errorText.reqData);
+        }
+        let isLog = tokenService.validateAccessToken(access)
+        console.log(isLog.payload);
+        if(isLog.payload != task1){
             throw apiError.BadRequest(errorText.reqData);
         }
         let product = await productService.findProductByArt(article);
@@ -181,9 +204,140 @@ class product{
         if(!task1  | !type | !value){
             throw apiError.BadRequest(errorText.reqData);
         }
-
+        let isLog = tokenService.validateAccessToken(access)
+        console.log(isLog.payload);
+        if(isLog.payload != task1){
+            throw apiError.BadRequest(errorText.reqData);
+        }
         //await productDB.
     }
+
+    async getCompetition(article1, article2,  access){
+        console.log(article1,article2);
+        // let isLog = tokenService.validateAccessToken(access)
+        // console.log(isLog.payload);
+        // if(isLog.payload != task1){
+        //     throw apiError.BadRequest(errorText.reqData);
+        // }
+        let driver = await new Builder().forBrowser(Browser.EDGE).build();
+        await driver.get('https://app.shopstat.ru/auth/login-by-email');
+        await sleep(600);
+
+        let input = await driver.findElements(By.className('MuiInputBase-input'));
+        await input[0].sendKeys('asunov.artur.2007@gmail.com');
+        await input[1].sendKeys('Karate120');
+        await driver.findElement(By.className('MuiButton-root')).click();
+        await sleep(1000);
+        await driver.get(`https://app.shopstat.ru/compare-products?q1=${article1}&q2=${article2}`);
+        await sleep(1000);
+        let product = await  driver.findElements(By.className('MuiTableCell-body'));
+
+        let products = [];
+        for(let i of product){
+            let text = await i.getText();
+            products.push(text);
+        }
+        let wordsList = {}
+        console.log(products);
+        let names =  products.filter(i => {
+
+            return  !+i;
+        });
+        let numbers = products.filter(i => {
+
+            return  +i;
+        });
+        for(let i in names){
+            console.log(i);
+            let key = names[i];
+            let value = numbers[i];
+            if(!wordsList[key]){
+                wordsList[key] = [];
+            }
+            wordsList[key].push(value)
+        }
+
+        return wordsList;
+    }
+
+    async getAnalyze(article, access){
+        if(!access | !article){
+
+        }
+        // let isLog = tokenService.validateAccessToken(access)
+        // console.log(isLog.payload);
+        // if(isLog.payload){
+        //   //  throw apiError.BadRequest(errorText.reqData);
+        // }
+        let driver = await new Builder().forBrowser(Browser.EDGE).build();
+        await driver.get('https://app.shopstat.ru/auth/login-by-email');
+        await sleep(600);
+
+        let input = await driver.findElements(By.className('MuiInputBase-input'));
+        await input[0].sendKeys('asunov.artur.2007@gmail.com');
+        await input[1].sendKeys('Karate120');
+        await driver.findElement(By.className('MuiButton-root')).click();
+        await sleep(600);
+        await driver.get(`https://app.shopstat.ru/search-queries-by-product?q=${article}`);
+        await sleep(3000);
+        let body = await driver.findElements(By.className('MuiTableCell-body'));
+        let products = [];
+        let keys = [],
+            data = []
+        for(let i of body){
+            let text = await i.getText();
+            if(!+text && text.length > 8){
+                keys.push(text)
+            } else if(text == '—' || +text){
+                data.push(text)
+            }
+            console.log(`${text} fewfw`)
+            products.push(text);
+        }
+        let head = await driver.findElements(By.className('MuiTableCell-head'));
+        let heads = [];
+        for(let i of head){
+            let text = await i.getText();
+            if((text !='Поисковый запрос' && text !='Товаров' && text != '') || text.length < 2)
+            heads.push(text);
+        }
+        let answer = { products: {}, dates: heads, seller: [], order: []};
+        for(let key of keys){
+            answer.products[key] = [];
+            for(let i in data){
+                if(i % heads.length - 1 == 0 && i !=0){
+                    break;
+                }
+                answer.products[key].push(data[i]);
+            }
+
+        }
+        for(let i in data){
+            let key = keys[i % heads.length - 1];
+            if(!answer.products[key]){
+                answer.products[key] = [];
+            }
+            answer.products[key].push(data[i]);
+        }
+        console.log(answer);
+        driver.quit();
+        let productAnswer = await productDB.getAnalyzeProduct(article);
+        let seller = await productDB.getAnalyzeGraphSeller(article);
+        let order = await productDB.getAnalyzeGraphOrder(article);
+        answer.data = productAnswer;
+        answer.seller = seller;
+        answer.order = order;
+        return answer;
+    }
+
+    async getProduct(article){
+        let product = {};
+
+        product = await productService.findProductByArt(article);
+
+        return product;
+    }
+
 }
 
 module.exports = new product();
