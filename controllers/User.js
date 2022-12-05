@@ -50,6 +50,7 @@ class User {
         try {
             const {task1} = req.body;
             const {refreshToken} = req.cookies;
+            console.log(req.cookies);
             let answer = await service.refresh(task1, refreshToken);
             res.cookie('refreshToken', answer['tokens']['refresh'], {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true})
             answer = answerModule.register(answer);

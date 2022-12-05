@@ -5,7 +5,7 @@ class Product{
     async sellers(req, res, next){
         try {
             const {dateFrom, flag, type, access, task1, article, date} = req.body;
-
+            console.log(access);
             let answer = await service.seller(dateFrom, flag, type, access, task1, article, date);
             answer = answerModule.product(answer);
             res.json(answer)
@@ -20,7 +20,7 @@ class Product{
     async order(req, res, next){
         try {
             const {dateFrom, flag, type, access, task1, article, date} = req.body;
-
+            console.log(access);
             let answer = await service.order(dateFrom, flag, type, access, task1, article, date);
             answer = answerModule.product(answer);
             res.json(answer);

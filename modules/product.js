@@ -12,16 +12,24 @@ let answer = [];
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
+function authValidate(token, task1){
+    let isLog = tokenService.validateAccessToken(token)
+    console.log(token);
+    if(isLog){
+        if(isLog.payload != task1){
+            throw apiError.BadRequest(errorText.tokenError);
+        }
+    }  else {
+        throw apiError.BadRequest(errorText.tokenError);
+    }
+}
+
 class product{
     async seller(dateFrom, flag = false, type = 0, access, task1, article = false, date = false){
         if(!dateFrom){
             throw apiError.BadRequest(errorText.reqData);
         }
-        let isLog = tokenService.validateAccessToken(access)
-        console.log(isLog.payload);
-        if(isLog.payload != task1){
-            throw apiError.BadRequest(errorText.reqData);
-        }
+        authValidate(access, task1);
         let token = await userDB.getUserByTask1(task1);
         let lasUpdates = await userDB.getUserSaves(1, task1);
         token = token[0]['token'];
@@ -37,13 +45,14 @@ class product{
                 let date = String(i['date']).split('T')[0];
                 products.push({});
 
-                products[products.length - 1]['img'] = `https://images.wbstatic.net/c246x328/new/${String(i['supplierArticle']).slice(0, 4)}0000/${String(i['supplierArticle'])['supplierArticle']}-1.jpg`
                 products[products.length - 1]['discount'] = i['discountPercent'];
                 products[products.length - 1]['naming'] = i['subject'];
                 products[products.length - 1]['brand'] = i['brand'];
-                products[products.length - 1]['price'] += Math.round(+i['totalPrice']);
-                products[products.length - 1]['article'] = i['supplierArticle'];
+                products[products.length - 1]['price'] += +i['totalPrice'];
+                products[products.length - 1]['article'] = i['nmId'];
                 products[products.length - 1]['date'] = date;
+                products[products.length - 1]['img'] = `https://images.wbstatic.net/c246x328/new/${String(products[products.length - 1]['article']).slice(0, 5)}0000/${String(products[products.length - 1]['article'])}-1.jpg`;
+                console.log(i);
             });
             await productDB.addSeller(task1, products);
             await userDB.setUserSaves(task1, 1);
@@ -68,11 +77,7 @@ class product{
         if(!dateFrom){
             throw apiError.BadRequest(errorText.reqData);
         }
-        let isLog = tokenService.validateAccessToken(access)
-        console.log(isLog.payload);
-        if(isLog.payload != task1){
-            throw apiError.BadRequest(errorText.reqData);
-        }
+        authValidate(access, task1);
         let token = await userDB.getUserByTask1(task1);
         let lasUpdates = await userDB.getUserSaves (2, task1);
         token = token[0]['token'];
@@ -84,12 +89,12 @@ class product{
             response.data.map(async i => {
 
                 products.push({});
-                products[products.length - 1]['img'] = `https://images.wbstatic.net/c246x328/new/${String(i['supplierArticle']).slice(0, 4)}0000/${String(i['supplierArticle'])}-1.jpg`
+                products[products.length - 1]['img'] = `https://images.wbstatic.net/c246x328/new/${String(i['nmId']).slice(0, 5)}0000/${String(i['nmId'])}-1.jpg`
                 products[products.length - 1]['price'] = Math.round(+i['totalPrice']);
                 products[products.length - 1]['brand'] = i['brand'];
                 products[products.length - 1]['naming'] = i['subject'];
                 products[products.length - 1]['discountPercent'] = i['discountPercent'];
-                products[products.length - 1]['article'] = i['supplierArticle'];
+                products[products.length - 1]['article'] = i['nmId'];
                 products[products.length - 1]['date'] = String(i['date']).replace('T', ' ');
 
 
@@ -108,14 +113,11 @@ class product{
     }
 
     async reportSeller(type, article = false, access, task1){
+        console.log(access);
         if(!type){
             throw apiError.BadRequest(errorText.reqData);
         }
-        // let isLog = tokenService.validateAccessToken(access)
-        // console.log(access);
-        // if(isLog.payload != task1){
-        //     throw apiError.BadRequest(errorText.reqData);
-        // }
+        authValidate(access, task1);
         let token = await userDB.getUserByTask1(task1);
         let lasUpdates = await userDB.getUserSaves( 3, task1);
         token = token[0]['token'];
@@ -139,11 +141,14 @@ class product{
                 products[products.length - 1]['countRetail'] = +i['return_amount'];
                 products[products.length - 1]['priceRetail'] = +i['return_amount'] * (+i['retail_amount']);
                 products[products.length - 1]['logic'] = i['delivery_rub'];
-                products[products.length - 1]['priceBuy'] = +i['ppvz_for_pay'] * (+i['delivery_amount']);
-                products[products.length - 1]['price'] = +i['ppvz_for_pay'];
-                products[products.length - 1]['img'] = `https://images.wbstatic.net/c246x328/new/${nm_id.slice(0, 4)}0000/${nm_id}-1.jpg`
+                products[products.length - 1]['priceBuy'] = +i['retail_price'];
+                products[products.length - 1]['price'] = +i['retail_price'];
+                products[products.length - 1]['img'] = `https://images.wbstatic.net/c246x328/new/${nm_id.slice(0, 5)}0000/${nm_id}-1.jpg`
                 products[products.length - 1]['discount'] = i['product_discount_for_report'];
                 products[products.length - 1]['penalty'] = i['penalty'];
+                products[products.length - 1]['owner'] = i['sa_name'];
+                products[products.length - 1]['size'] = i['ts_name'];
+                //sa_name
 
             });
             await productDB.addAnalyze(task1, products);
@@ -214,11 +219,7 @@ class product{
 
     async getCompetition(article1, article2,  access){
         console.log(article1,article2);
-        // let isLog = tokenService.validateAccessToken(access)
-        // console.log(isLog.payload);
-        // if(isLog.payload != task1){
-        //     throw apiError.BadRequest(errorText.reqData);
-        // }
+        authValidate(access, 1111);
         let driver = await new Builder().forBrowser(Browser.CHROME).build();
         await driver.get('https://app.shopstat.ru/auth/login-by-email');
         await sleep(600);
@@ -264,12 +265,8 @@ class product{
         if(!access | !article){
 
         }
-        // let isLog = tokenService.validateAccessToken(access)
-        // console.log(isLog.payload);
-        // if(isLog.payload){
-        //   //  throw apiError.BadRequest(errorText.reqData);
-        // }
-        let driver = await new Builder().forBrowser(Browser.CHROME).build();
+        authValidate(access, 1111);
+        let driver = await new Builder().forBrowser(Browser.EDGE).build();
         await driver.get('https://app.shopstat.ru/auth/login-by-email');
         await sleep(600);
 
@@ -332,7 +329,6 @@ class product{
 
     async getProduct(article){
         let product = {};
-
         product = await productService.findProductByArt(article);
 
         return product;

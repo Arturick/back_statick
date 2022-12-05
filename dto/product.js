@@ -31,7 +31,8 @@ class Product {
         let sqlScript = ``;
         await this.clear(task1, 1);
         for(let i of products){
-            sqlScript = `INSERT INTO seller (brand, task1, article, discount, price, naming, date_seller, retail_price, img, penalty) VALUES('${i['brand']}', ${task1}, '${i['article']}', '${i['discount']}', '${i['price']}', '${i['naming']}', '${i['date']}', '${i['price']}', '${i['img']}', ${i['penalty']})`
+            console.log(i['img']);
+            sqlScript = `INSERT INTO seller (brand, task1, article, discount, price, naming, date_seller, retail_price, img) VALUES('${i['brand']}', ${task1}, '${i['article']}', '${i['discount']}', '${i['price']}', '${i['naming']}', '${i['date']}', '${i['price']}', '${i['img']}')`
             await connection.query(sqlScript);
 
         }
@@ -40,7 +41,7 @@ class Product {
         let sqlScript = ``;
         await this.clear(task1, 3);
         for(let i of products){
-            sqlScript = `INSERT INTO \`analyze\` (brand, task1, article, discount, price, naming, date_report, retail_price, img, count_report, total_price, barcode, size_product, retail_count, logic, com_wb) VALUES('${i['brand']}', ${task1}, '${i['article']}', ${i['discount']}, ${i['price']}, '${i['naming']}', ${i['date']}, ${i['price']}, '${i['img']}', 1, ${i['priceBuy']}, ${i['barcode']}, '${i['size']}',   ${i['countRetail']}, ${i['logic']}, 1000)`;
+            sqlScript = `INSERT INTO \`analyze\` (brand, task1, article, discount, price, naming, date_report, retail_price, img, count_report, total_price, barcode, size_product, retail_count, logic, com_wb, penalty, owner_article) VALUES('${i['brand']}', ${task1}, '${i['article']}', ${i['discount']}, ${i['price']}, '${i['naming']}', ${i['date']}, ${i['price']}, '${i['img']}', 1, ${i['priceBuy']}, ${i['barcode']}, '${i['size']}',   ${i['countRetail']}, ${i['logic']}, 1000, ${i['penalty']}, '${i['owner']}')`;
             await connection.query(sqlScript);
 
         }
@@ -48,7 +49,7 @@ class Product {
     async getAnalyze(task1, type, article = false){
         let sqlScript = `SELECT *, COUNT(*) as cnt, SUM(price) as total FROM \`analyze\` t WHERE task1 = ${task1}  GROUP by article, date_report`;
         if(article != false){
-            sqlScript = `SELECT COUNT(*), brand, img, article, barcode, size_product, price, retail_price, SUM(total_price) as totalBuy , SUM(retail_price), SUM(retail_count) as countRetail, SUM(price), SUM(penalty) FROM \`analyze\` WHERE article = ${article}`
+            sqlScript = `SELECT *, COUNT(*) as cntBuy, SUM(price) as totalBuy , SUM(retail_price) as rtp, SUM(retail_count) as countRetail,  SUM(price), SUM(logic) as lg, SUM(penalty) as pnt FROM \`analyze\` WHERE article = ${article}`
         }
         let answer = {};
         answer['products'] = await connection.query(sqlScript);

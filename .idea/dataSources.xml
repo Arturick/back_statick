@@ -8,6 +8,7 @@
       <jdbc-url>jdbc:mysql://31.31.198.237:3306/u0215623_front-tricks</jdbc-url>
       <driver-properties>
         <property name="serverTimezone" value="UTC" />
+        <property name="characterEncoding" value="UTF-8" />
       </driver-properties>
     </data-source>
   </component>
