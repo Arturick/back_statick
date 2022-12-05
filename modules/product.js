@@ -266,7 +266,7 @@ class product{
 
         }
         authValidate(access, 1111);
-        let driver = await new Builder().forBrowser(Browser.EDGE).build();
+        let driver = await new Builder().forBrowser(Browser.CHROME).build();
         await driver.get('https://app.shopstat.ru/auth/login-by-email');
         await sleep(600);
 
