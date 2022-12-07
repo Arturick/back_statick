@@ -9,7 +9,8 @@ router.post('/report', productController.reportSeller);
 router.post('/getCompetition', productController.getCompetition);
 router.post('/getAnalyze', productController.getAnalyze);
 router.post('/getByArticle', productController.getByArticle);
-router.get('/testReport', productController.testReport);
+router.post('/abcAnalyze', productController.abcAnalyze);
+router.post('/getAllEconomy', productController.getAllEconomy);
 
 router.post('/register', userController.register);
 router.post('/login', userController.login);
