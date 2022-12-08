@@ -66,12 +66,7 @@ class product{
 
         }
         let product = [];
-        if(!graph){
-            console.log('xxxx');
-            product = await productDB.getSeller(1111, 4);
-        } else {
-            product = await productDB.getSellerGraph(1111);
-        }
+
         let productList = product['products'];
         if(article){
             productList = await productDB.getByArticleDateSeller(task1, article, date);
@@ -80,6 +75,15 @@ class product{
                 return new Date(date).getTime() ==  i['date_seller'].getTime();
             });
             console.log(productList);
+        }
+        if(!graph && !article){
+            console.log('xxxx');
+            product = await productDB.getSeller(1111, 4);
+        } else {
+            if(graph){
+                product = await productDB.getSellerGraph(1111, article);
+            }
+
         }
         answer = {products: productList, total: product['total'], count: product['cnt']};
         return  answer;
@@ -118,13 +122,10 @@ class product{
             await userDB.setUserSaves(task1, 2);
         }
         let product = [];
-        if(!graph){
-            product = await productDB.getOrder(1111, type);
-        } else {
-            product = await productDB.getOrderGraph(1111);
-        }
-        let productList = product['products'];
-        console.log(date);
+        let productList = [];
+
+
+
         if(article){
             productList = await productDB.getByArticleDateOrder(task1, article, date);
             productList = productList.filter(i => {
@@ -132,6 +133,16 @@ class product{
                 return new Date(date).getTime() ==  i['date_seller'].getTime();
             });
             console.log(productList);
+        }
+        if(!graph && !article){
+            product = await productDB.getOrder(1111, type);
+        } else {
+            if(graph){
+                product = await productDB.getOrderGraph(1111, article);
+                productList = product['products'];
+                console.log(productList);
+            }
+
         }
         answer = {products: productList, count: product['cnt'], total: product['total'],};
         return  answer;
@@ -249,7 +260,7 @@ class product{
     async getCompetition(article1, article2,  access){
 
         //authValidate(access, 1111);
-        let driver = await new Builder().forBrowser(Browser.CHROME).build();
+        let driver = await new Builder().forBrowser(Browser.EDGE).build();
         await driver.get('https://app.shopstat.ru/auth/login-by-email');
         await sleep(600);
 
@@ -271,12 +282,13 @@ class product{
         console.log(products);
         let names =  products.filter(i => {
 
-            return  !+i;
+            return  !+i.replace(' ', '');
         });
         let numbers = products.filter(i => {
 
-            return  +i;
+            return  +i.replace(' ', '') || i == '—';
         });
+        console.log(names, numbers);
         for(let i in names){
             console.log(i);
             let key = names[i];
@@ -294,8 +306,8 @@ class product{
         if(!access | !article){
 
         }
-        authValidate(access, 1111);
-        let driver = await new Builder().forBrowser(Browser.CHROME).build();
+         //authValidate(access, 1111);
+        let driver = await new Builder().forBrowser(Browser.EDGE).build();
         await driver.get('https://app.shopstat.ru/auth/login-by-email');
         await sleep(600);
 
@@ -312,9 +324,9 @@ class product{
             data = []
         for(let i of body){
             let text = await i.getText();
-            if(!+text && text.length > 8){
+            if(!+text.replace(' ', '').replace(' ', '').replace('\n', '') && text != '' && text !='—' ){
                 keys.push(text)
-            } else if(text == '—' || +text){
+            } else if(text !=''){
                 data.push(text)
             }
             products.push(text);
@@ -327,24 +339,42 @@ class product{
             heads.push(text);
         }
         let answer = { products: {}, dates: heads, seller: [], order: []};
-        for(let key of keys){
-            answer.products[key] = [];
-            for(let i in data){
-                if(i % heads.length - 1 == 0 && i !=0){
+        let already = [];
+        let index = 0;
+        for(let key in keys){
+            if(!answer.products[keys[key]]){
+                answer.products[keys[key]] = [];
+            }
+            answer.products[keys[key]].push(data[index]);
+            index+=1;
+        }
+        index = keys.length;
+        let keysIndex = 0;
+        for(let i =  index; i < data.length; i++) {
+            if (data[index].split('\n').length > 1) {
+                let num = data[index].split('\n');
+                let num2 = data[1 + index].split('\n');
+                if (num[0] > num2[0]) {
+                    data[index] = `${num[0]}⬇${num[1]}`;
+                } else {
+                    data[index] = `${num[0]}⬆${num[1]}`;
+
+                }
+            }
+            if(answer.products[keys[keysIndex]].length >=heads.length){
+                if(keys[keysIndex+1]) {
+
+                    keysIndex+=1;
+                } else {
                     break;
                 }
-                answer.products[key].push(data[i]);
             }
+            console.log(keys[keysIndex]);
+            answer.products[keys[keysIndex]].push(data[index]);
+            index+=1;
+        }
+        console.log(data)
 
-        }
-        for(let i in data){
-            let key = keys[i % heads.length - 1];
-            if(!answer.products[key]){
-                answer.products[key] = [];
-            }
-            answer.products[key].push(data[i]);
-        }
-        console.log(answer);
         driver.quit();
         let productAnswer = await productDB.getAnalyzeProduct(article);
         let seller = await productDB.getAnalyzeGraphSeller(article);

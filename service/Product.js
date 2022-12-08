@@ -58,10 +58,10 @@ class Product {
                 console.log(error);
             })
 
-        if(!product['selling']){
+        if(!product){
             return false;
         }
-        productList['image'] = `https://images.wbstatic.net/c246x328/new/${String(article).slice(0,5)}0000/${String(article)}-1.jpg`
+        productList['image'] = `https://images.wbstatic.net/c246x328/new/${String(article).slice(0,4)}0000/${String(article)}-1.jpg`
         productList['brand'] = product['selling']['brand_name'];
         productList['article'] = String(article);
         productList['price'] = +product2['data']['products'][0]['salePriceU'] / 100;

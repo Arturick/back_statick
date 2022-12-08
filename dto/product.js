@@ -81,23 +81,34 @@ class Product {
         answer['cnt'] = answer['cnt'][0];
         return answer;
     }
-    async getOrderGraph(task1){
+    async getOrderGraph(task1, article){
+        console.log(article);
         let sqlScript = `SELECT *, COUNT(*) as cnt, SUM(price) as total FROM \`order\` WHERE task1 = ${task1} and date_seller > DATE_SUB(NOW(), INTERVAL ${dataType[3]} HOUR) GROUP by date_seller`;
+
+        if(article){
+            sqlScript = `SELECT *, COUNT(*) as cnt, SUM(price) as total FROM \`order\` WHERE task1 = ${task1} and article = '${article}' and date_seller > DATE_SUB(NOW(), INTERVAL ${dataType[4]} HOUR) GROUP by date_seller`;
+
+        }
         let answer = {};
         answer['products'] = await connection.query(sqlScript);
-        answer['cnt'] = await connection.query(`SELECT COUNT(*) as cnt FROM \`order\` t WHERE task1 = ${task1} and date_seller  > DATE_SUB(NOW(), INTERVAL ${dataType[3]} HOUR)`);
-        answer['total'] = await connection.query(`SELECT SUM(price) as cnt FROM \`order\` t WHERE task1 = ${task1} and date_seller  > DATE_SUB(NOW(), INTERVAL ${dataType[3]} HOUR)`);
-        answer['total'] = answer['total'][0];
+
+        //answer['cnt'] = await connection.query(`SELECT COUNT(*) as cnt FROM \`order\` t WHERE task1 = ${task1} and date_seller  > DATE_SUB(NOW(), INTERVAL ${dataType[3]} HOUR)`);
+        //answer['total'] = await connection.query(`SELECT SUM(price) as cnt FROM \`order\` t WHERE task1 = ${task1} and date_seller  > DATE_SUB(NOW(), INTERVAL ${dataType[3]} HOUR)`);
+        //answer['total'] = answer['total'][0];
         answer['products'] = answer['products'][0];
-        answer['cnt'] = answer['cnt'][0];
+        //answer['cnt'] = answer['cnt'][0];
         return answer;
     }
-    async getSellerGraph(task1){
+    async getSellerGraph(task1, article){
         let sqlScript = `SELECT *, COUNT(*) as cnt, SUM(price) as total FROM \`seller\` WHERE task1 = ${task1} and date_seller > DATE_SUB(NOW(), INTERVAL ${dataType[3]} HOUR) GROUP by date_seller`;
         let answer = {};
+        if(article){
+            sqlScript = `SELECT *, COUNT(*) as cnt, SUM(price) as total FROM \`seller\` WHERE task1 = ${task1} and article = '${article}' and date_seller > DATE_SUB(NOW(), INTERVAL ${dataType[4]} HOUR) GROUP by date_seller`;
+
+        }
         answer['products'] = await connection.query(sqlScript);
-        answer['cnt'] = await connection.query(`SELECT COUNT(*) as cnt FROM \`order\` t WHERE task1 = ${task1} and date_seller  > DATE_SUB(NOW(), INTERVAL ${dataType[3]} HOUR)`);
-        answer['total'] = await connection.query(`SELECT SUM(price) as cnt FROM \`order\` t WHERE task1 = ${task1} and date_seller  > DATE_SUB(NOW(), INTERVAL ${dataType[3]} HOUR)`);
+        answer['cnt'] = await connection.query(`SELECT COUNT(*) as cnt FROM \`order\` t WHERE task1 = ${task1} and date_seller  > DATE_SUB(NOW(), INTERVAL ${dataType[4]} HOUR)`);
+        answer['total'] = await connection.query(`SELECT SUM(price) as cnt FROM \`order\` t WHERE task1 = ${task1} and date_seller  > DATE_SUB(NOW(), INTERVAL ${dataType[4]} HOUR)`);
         answer['total'] = answer['total'][0];
         answer['products'] = answer['products'][0];
         answer['cnt'] = answer['cnt'][0];
