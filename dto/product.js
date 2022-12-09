@@ -31,6 +31,7 @@ class Product {
         let sqlScript = ``;
         await this.clear(task1, 1);
         for(let i of products){
+
             sqlScript = `INSERT INTO seller (brand, task1, article, discount, price, naming, date_seller, retail_price, img, srid, barcode, category, size, region, pwz) VALUES('${i['brand']}', ${task1}, '${i['article']}', '${i['discount']}', ${i['price']}, '${i['naming']}', '${i['date']}', ${i['price']}, '${i['img']}', '${i['srid']}', '${i['barcode']}', '${i['category']}', '${i['size']}', '${i['region']}', '${i['pwz']}')`
             await connection.query(sqlScript);
 
