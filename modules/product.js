@@ -55,6 +55,11 @@ class product{
                 products[products.length - 1]['srid'] = i['srid'];
                 products[products.length - 1]['date'] = date;
                 products[products.length - 1]['img'] = `https://images.wbstatic.net/c246x328/new/${String(products[products.length - 1]['article']).slice(0, 5)}0000/${String(products[products.length - 1]['article'])}-1.jpg`;
+                products[products.length - 1]['barcode'] = i['barcode'];
+                products[products.length - 1]['category'] = i['category'];
+                products[products.length - 1]['size'] = i['techSize'];
+                products[products.length - 1]['region'] = i['oblast'];
+                products[products.length - 1]['pwz'] = i['warehouseName'];
             }
             await productDB.addSeller(task1, products);
             await userDB.setUserSaves(task1, 1);
@@ -71,7 +76,7 @@ class product{
         if(article){
             productList = await productDB.getByArticleDateSeller(task1, article, date);
             productList = productList.filter(i => {
-
+                console.log(new Date(date).getTime() ==  i['date_seller'].getTime());
                 return new Date(date).getTime() ==  i['date_seller'].getTime();
             });
             console.log(productList);
@@ -79,9 +84,11 @@ class product{
         if(!graph && !article){
             console.log('xxxx');
             product = await productDB.getSeller(1111, 4);
+            productList = product['products'];
         } else {
             if(graph){
                 product = await productDB.getSellerGraph(1111, article);
+                productList = product['products'];
             }
 
         }
@@ -115,7 +122,11 @@ class product{
                 products[products.length - 1]['discountPercent'] = i['discountPercent'];
                 products[products.length - 1]['article'] = i['nmId'];
                 products[products.length - 1]['date'] = String(i['date']).replace('T', ' ');
-
+                products[products.length - 1]['barcode'] = i['barcode'];
+                products[products.length - 1]['category'] = i['category'];
+                products[products.length - 1]['size'] = i['techSize'];
+                products[products.length - 1]['region'] = i['oblast'];
+                products[products.length - 1]['pwz'] = i['warehouseName'];
 
             });
             await productDB.addOrder(task1, products);
@@ -128,6 +139,7 @@ class product{
 
         if(article){
             productList = await productDB.getByArticleDateOrder(task1, article, date);
+
             productList = productList.filter(i => {
 
                 return new Date(date).getTime() ==  i['date_seller'].getTime();
@@ -136,6 +148,7 @@ class product{
         }
         if(!graph && !article){
             product = await productDB.getOrder(1111, type);
+            productList = product['products'];
         } else {
             if(graph){
                 product = await productDB.getOrderGraph(1111, article);
