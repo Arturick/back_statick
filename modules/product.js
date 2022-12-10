@@ -284,14 +284,9 @@ class product{
             .build();
 
         await driver.get('https://app.shopstat.ru/auth/login-by-email');
-        let input = [];
-        while (1 < 2){
-            let input = await driver.findElements(By.className('MuiInputBase-input'));
-            await driver.executeScript("window.scrollBy(0,250)", "");
-            if(input.length > 0){
-                break;
-            }
-        }
+
+        let input = await driver.findElements(By.className('MuiInputBase-input'));
+        await driver.executeScript("window.scrollBy(0,250)", "");
         await sleep(5000);
         await input[0].sendKeys('asunov.artur.2007@gmail.com');
         await input[1].sendKeys('Karate120');
@@ -351,6 +346,7 @@ class product{
         await sleep(600);
 
         let input = await driver.findElements(By.className('MuiInputBase-input'));
+        await sleep(1500);
         await input[0].sendKeys('asunov.artur.2007@gmail.com');
         await input[1].sendKeys('Karate120');
         await driver.findElement(By.className('MuiButton-root')).click();
