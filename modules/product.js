@@ -289,10 +289,13 @@ class product{
         let input = await driver.findElements(By.className('MuiInputBase-input'));
         await input[0].sendKeys('asunov.artur.2007@gmail.com');
         await input[1].sendKeys('Karate120');
+        await driver.executeScript("window.scrollBy(0,250)", "");
         await driver.findElement(By.className('MuiButton-root')).click();
         await sleep(1000);
+        await driver.executeScript("window.scrollBy(0,250)", "");
         await driver.get(`https://app.shopstat.ru/compare-products?q1=${article1}&q2=${article2}`);
         await sleep(1000);
+        await driver.executeScript("window.scrollBy(0,250)", "");
         let product = await  driver.findElements(By.className('MuiTableCell-body'));
 
         let products = [];
