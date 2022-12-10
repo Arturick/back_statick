@@ -25,8 +25,6 @@ function authValidate(token, task1){
         throw apiError.BadRequest(errorText.tokenError);
     }
 }
-let options = new Options();
-options.setBinary(path)
 class product{
     async seller(graph = false, dateFrom, flag = false, type = 0, access, task1 = 1111, article = false, date = false){
         if(!dateFrom){
