@@ -7,8 +7,9 @@ const userDB = require('../dto/user');
 const productDB = require('../dto/product');
 require('chromedriver');
 let webdriver = require('selenium-webdriver');
+let chrome = require("selenium-webdriver/chrome");
 const tokenService = require('../service/Token');
-
+import {By} from 'selenium-webdriver';
 
 let answer = [];
 function sleep(ms) {
@@ -31,7 +32,7 @@ class product{
             throw apiError.BadRequest(errorText.reqData);
         }
         task1 = 1111;
-       // authValidate(access, task1);
+        // authValidate(access, task1);
         let token = await userDB.getUserByTask1(task1);
         let lasUpdates = await userDB.getUserSaves(1, task1);
         token = token[0]['token'];
@@ -205,7 +206,7 @@ class product{
                 //sa_name
 
             }
-        await productDB.addAnalyze(task1, products);
+            await productDB.addAnalyze(task1, products);
             await userDB.setUserSaves(task1, 3);
         }
         let product = await productDB.getAnalyze(task1, type, article);
@@ -275,9 +276,13 @@ class product{
 
         //authValidate(access, 1111);
 
-        let driver =  driver = new webdriver.Builder()
+        let options = new chrome.Options();
+        options.addArguments(['--no-sandbox', '--headless']);
+        let driver = new webdriver.Builder()
             .forBrowser('chrome')
+            .setChromeOptions(options)
             .build();
+
         await driver.get('https://app.shopstat.ru/auth/login-by-email');
         await sleep(600);
 
@@ -323,10 +328,14 @@ class product{
         if(!access | !article){
 
         }
-         //authValidate(access, 1111);
-        let driver =  driver = new webdriver.Builder()
+        //authValidate(access, 1111);
+        let options = new chrome.Options();
+        options.addArguments(['--no-sandbox', '--headless']);
+        let driver = new webdriver.Builder()
             .forBrowser('chrome')
+            .setChromeOptions(options)
             .build();
+
         await driver.get('https://app.shopstat.ru/auth/login-by-email');
         await sleep(600);
 
@@ -355,7 +364,7 @@ class product{
         for(let i of head){
             let text = await i.getText();
             if((text !='Поисковый запрос' && text !='Товаров' && text != '') || text.length < 2)
-            heads.push(text);
+                heads.push(text);
         }
         let answer = { products: {}, dates: heads, seller: [], order: []};
         let already = [];
