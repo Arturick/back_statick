@@ -330,7 +330,7 @@ class product{
         }
         //authValidate(access, 1111);
         let options = new chrome.Options();
-        options.addArguments(['--no-sandbox', '--headless']);
+        options.addArguments(['--no-sandbox', '--headless', '—disable-gpu']);
         let driver = new webdriver.Builder()
             .forBrowser('chrome')
             .setChromeOptions(options)
