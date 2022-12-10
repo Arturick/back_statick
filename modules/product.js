@@ -9,7 +9,7 @@ require('chromedriver');
 let webdriver = require('selenium-webdriver');
 let chrome = require("selenium-webdriver/chrome");
 const tokenService = require('../service/Token');
-import {By} from 'selenium-webdriver';
+const {Builder, Browser, By, Key, until} = require('selenium-webdriver');
 
 let answer = [];
 function sleep(ms) {
