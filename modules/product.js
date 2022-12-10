@@ -277,12 +277,18 @@ class product{
         //authValidate(access, 1111);
 
         let options = new chrome.Options();
-        options.addArguments(['--no-sandbox', '--headless']);
+        options.addArguments(['--no-sandbox', '--headless', '—disable-gpu', '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36']);
+
         let driver = new webdriver.Builder()
             .forBrowser('chrome')
             .setChromeOptions(options)
             .build();
-
+        await driver.manage().window().setRect({
+            x: 0,
+            y: 0,
+            width: 1920,
+            height: 1080
+        });
         await driver.get('https://app.shopstat.ru/auth/login-by-email');
         await sleep(600);
 
