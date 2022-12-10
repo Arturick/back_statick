@@ -330,7 +330,8 @@ class product{
         }
         //authValidate(access, 1111);
         let options = new chrome.Options();
-        options.addArguments(['--no-sandbox', '—disable-gpu']);
+        options.addArguments(['--no-sandbox', '—disable-gpu', '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36']);
+
         let driver = new webdriver.Builder()
             .forBrowser('chrome')
             .setChromeOptions(options)
