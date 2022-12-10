@@ -5,7 +5,7 @@ const errorText = require('../src/answer').error;
 const productService = require('../service/Product');
 const userDB = require('../dto/user');
 const productDB = require('../dto/product');
-require('chromedriver');
+//require('chromedriver');
 let webdriver = require('selenium-webdriver');
 let chrome = require("selenium-webdriver/chrome");
 const tokenService = require('../service/Token');
@@ -284,21 +284,15 @@ class product{
             .build();
 
         await driver.get('https://app.shopstat.ru/auth/login-by-email');
+        await sleep(600);
 
         let input = await driver.findElements(By.className('MuiInputBase-input'));
-        await driver.executeScript("window.scrollBy(0,250)", "");
-        await sleep(5000);
         await input[0].sendKeys('asunov.artur.2007@gmail.com');
         await input[1].sendKeys('Karate120');
-        await sleep(600);
-        await driver.executeScript("window.scrollBy(0,250)", "");
-        await sleep(600);
         await driver.findElement(By.className('MuiButton-root')).click();
         await sleep(1000);
-        await driver.executeScript("window.scrollBy(0,250)", "");
         await driver.get(`https://app.shopstat.ru/compare-products?q1=${article1}&q2=${article2}`);
         await sleep(1000);
-        await driver.executeScript("window.scrollBy(0,250)", "");
         let product = await  driver.findElements(By.className('MuiTableCell-body'));
 
         let products = [];
@@ -341,12 +335,17 @@ class product{
             .forBrowser('chrome')
             .setChromeOptions(options)
             .build();
-
+        await driver.manage().window().setRect({
+            x: 0,
+            y: 0,
+            width: 1920,
+            height: 1080
+        });
         await driver.get('https://app.shopstat.ru/auth/login-by-email');
-        await sleep(5000);
-
+        await sleep(600);
+        let str = await driver.getPageSource();
+            console.log(str);
         let input = await driver.findElements(By.className('MuiInputBase-input'));
-        await sleep(5000);
         await input[0].sendKeys('asunov.artur.2007@gmail.com');
         await input[1].sendKeys('Karate120');
         await driver.findElement(By.className('MuiButton-root')).click();
