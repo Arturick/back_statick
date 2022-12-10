@@ -343,7 +343,7 @@ class product{
             .build();
 
         await driver.get('https://app.shopstat.ru/auth/login-by-email');
-        await sleep(600);
+        await sleep(5000);
 
         let input = await driver.findElements(By.className('MuiInputBase-input'));
         await sleep(5000);
