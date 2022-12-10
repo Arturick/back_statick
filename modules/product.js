@@ -287,9 +287,13 @@ class product{
         await sleep(600);
 
         let input = await driver.findElements(By.className('MuiInputBase-input'));
+        await driver.executeScript("window.scrollBy(0,250)", "");
+        await sleep(600);
         await input[0].sendKeys('asunov.artur.2007@gmail.com');
         await input[1].sendKeys('Karate120');
+        await sleep(600);
         await driver.executeScript("window.scrollBy(0,250)", "");
+        await sleep(600);
         await driver.findElement(By.className('MuiButton-root')).click();
         await sleep(1000);
         await driver.executeScript("window.scrollBy(0,250)", "");
