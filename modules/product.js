@@ -5,8 +5,10 @@ const errorText = require('../src/answer').error;
 const productService = require('../service/Product');
 const userDB = require('../dto/user');
 const productDB = require('../dto/product');
-const {Builder, Browser, By, Key, until} = require('selenium-webdriver');
+require('chromedriver');
+let webdriver = require('selenium-webdriver');
 const tokenService = require('../service/Token');
+
 
 let answer = [];
 function sleep(ms) {
@@ -23,7 +25,8 @@ function authValidate(token, task1){
         throw apiError.BadRequest(errorText.tokenError);
     }
 }
-
+let options = new Options();
+options.setBinary(path)
 class product{
     async seller(graph = false, dateFrom, flag = false, type = 0, access, task1 = 1111, article = false, date = false){
         if(!dateFrom){
@@ -273,7 +276,10 @@ class product{
     async getCompetition(article1, article2,  access){
 
         //authValidate(access, 1111);
-        let driver = await new Builder().forBrowser(Browser.EDGE).build();
+
+        let driver =  driver = new webdriver.Builder()
+            .forBrowser('chrome')
+            .build();
         await driver.get('https://app.shopstat.ru/auth/login-by-email');
         await sleep(600);
 
@@ -320,7 +326,9 @@ class product{
 
         }
          //authValidate(access, 1111);
-        let driver = await new Builder().forBrowser(Browser.EDGE).build();
+        let driver =  driver = new webdriver.Builder()
+            .forBrowser('chrome')
+            .build();
         await driver.get('https://app.shopstat.ru/auth/login-by-email');
         await sleep(600);
 
