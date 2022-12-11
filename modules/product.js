@@ -386,11 +386,15 @@ class product{
             if(!answer.products[keys[key]]){
                 answer.products[keys[key]] = [];
             }
+            if(answer.products[keys[key]].length > 0){
+                continue;
+            }
             answer.products[keys[key]].push(data[index]);
             index+=1;
         }
         index = keys.length;
         let keysIndex = 0;
+        console.log(answer.products);
         for(let i =  index; i < data.length; i++) {
             if (data[index].split('\n').length > 1) {
                 let num = data[index].split('\n');
@@ -402,19 +406,26 @@ class product{
 
                 }
             }
-            if(answer.products[keys[keysIndex]].length >=heads.length){
-                if(keys[keysIndex+1]) {
 
+            if(answer.products[keys[keysIndex]].length >= heads.length){
+                if(keys.length  > keysIndex+1) {
                     keysIndex+=1;
                 } else {
                     break;
                 }
             }
-            console.log(keys[keysIndex]);
+            console.log(keysIndex);
+            if(answer.products[keys[keysIndex]].length >= heads.length){
+                if(keys.length  > keysIndex+1) {
+                    keysIndex+=1;
+                } else {
+                    break;
+                }
+            }
             answer.products[keys[keysIndex]].push(data[index]);
             index+=1;
         }
-        console.log(data)
+
 
         driver.quit();
         let productAnswer = await productDB.getAnalyzeProduct(article);
