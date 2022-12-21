@@ -36,7 +36,7 @@ class product{
         let token = await userDB.getUserByTask1(task1);
         let lasUpdates = await userDB.getUserSaves(1, task1);
         token = token[0]['token'];
-        console.log(lasUpdates);
+        console.log(type);
         if(lasUpdates.length < 1){
 
             let response,
@@ -85,7 +85,7 @@ class product{
         }
         if(!graph && !article){
             console.log('xxxx');
-            product = await productDB.getSeller(1111, 4);
+            product = await productDB.getSeller(1111, type);
             productList = product['products'];
         } else {
             if(graph){
@@ -275,9 +275,9 @@ class product{
     async getCompetition(article1, article2,  access){
 
         //authValidate(access, 1111);
-
+        //'--no-sandbox', '--headless', '—disable-gpu',
         let options = new chrome.Options();
-        options.addArguments(['--no-sandbox', '--headless', '—disable-gpu', '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36']);
+        options.addArguments([ '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36']);
 
         let driver = new webdriver.Builder()
             .forBrowser('chrome')
@@ -286,8 +286,8 @@ class product{
         await driver.manage().window().setRect({
             x: 0,
             y: 0,
-            width: 1920,
-            height: 1080
+            width: 1080,
+            height: 920
         });
         await driver.get('https://app.shopstat.ru/auth/login-by-email');
         await sleep(600);
@@ -310,7 +310,7 @@ class product{
         console.log(products);
         let names =  products.filter(i => {
 
-            return  !+i.replace(' ', '');
+            return  !+i.replace(' ', '' && i!= '—' && i!='');
         });
         let numbers = products.filter(i => {
 
@@ -495,6 +495,94 @@ class product{
         })
         return analyzeData;
 
+    }
+
+    async refreshDB(){
+        let tokens = await userDB.getAll();
+        for(let i of tokens){
+            await userDB.refreshUserProduct(i['task1']);
+            console.log(i);
+            let token = i['token'];
+                let response,
+                    products = [];
+                response = await axios.get(`https://suppliers-stats.wildberries.ru/api/v1/supplier/sales?dateFrom=2022-09-10&flag=0&key=${token}`)
+                console.log(response);
+                for( let i of response.data){
+                    let date = String(i['date']).split('T')[0];
+                    products.push({});
+                    let pr = await productDB.getByArticleOrder(i['nmId']);
+                    products[products.length - 1]['discount'] = i['discountPercent'];
+                    products[products.length - 1]['naming'] = i['subject'];
+                    products[products.length - 1]['brand'] = i['brand'];
+                    products[products.length - 1]['price'] = i['forPay'];
+                    products[products.length - 1]['article'] = i['nmId'];
+                    products[products.length - 1]['srid'] = i['srid'];
+                    products[products.length - 1]['date'] = date;
+                    products[products.length - 1]['img'] = `https://images.wbstatic.net/c246x328/new/${Math.floor(+products[products.length - 1]['article'] / 10000)}0000/${String(products[products.length - 1]['article'])}-1.jpg`;
+                    products[products.length - 1]['barcode'] = i['barcode'];
+                    products[products.length - 1]['category'] = i['category'];
+                    products[products.length - 1]['size'] = i['techSize'];
+                    products[products.length - 1]['region'] = i['oblast'];
+                    products[products.length - 1]['pwz'] = i['warehouseName'];
+                }
+                await productDB.addSeller(i['task1'], products);
+                await userDB.setUserSaves(i['task1'], 1);
+            products = [];
+            response = await axios.get(`https://suppliers-stats.wildberries.ru/api/v1/supplier/orders?dateFrom=2022-09-10&flag=0&key=${token}`)
+            response.data.map(async i => {
+
+                products.push({});
+                products[products.length - 1]['img'] = `https://images.wbstatic.net/c246x328/new/${Math.floor(+i['nmId'] / 10000)}0000/${String(i['nmId'])}-1.jpg`
+                products[products.length - 1]['price'] = Math.round(+i['totalPrice']);
+                products[products.length - 1]['brand'] = i['brand'];
+                products[products.length - 1]['srid'] = i['srid'];
+                products[products.length - 1]['naming'] = i['subject'];
+                products[products.length - 1]['discountPercent'] = i['discountPercent'];
+                products[products.length - 1]['article'] = i['nmId'];
+                products[products.length - 1]['date'] = String(i['date']).replace('T', ' ');
+                products[products.length - 1]['barcode'] = i['barcode'];
+                products[products.length - 1]['category'] = i['category'];
+                products[products.length - 1]['size'] = i['techSize'];
+                products[products.length - 1]['region'] = i['oblast'];
+                products[products.length - 1]['pwz'] = i['warehouseName'];
+
+            });
+            await productDB.addOrder(i['task1'], products);
+            await userDB.setUserSaves(i['task1'], 2);
+
+
+            products = [];
+            response = await axios.get(`https://suppliers-stats.wildberries.ru/api/v1/supplier/reportDetailByPeriod?dateFrom=2022-09-10&key=${token}&dateto=${new Date()}`)
+            for(let i of response.data) {
+                products.push({});
+                let nm_id = String(i['nm_id']);
+
+                products[products.length - 1]['date'] = i['date_to'].toLocaleString().split('T')[0];
+                products[products.length - 1]['brand'] = i['brand_name'];
+                products[products.length - 1]['article'] = nm_id;
+                products[products.length - 1]['barcode'] = i['barcode'];
+                let countProduct = await productDB.getByArticleSeller(nm_id);
+                products[products.length - 1]['countBuy'] = +countProduct['cnt'];
+                products[products.length - 1]['countRetail'] = +i['return_amount'];
+                products[products.length - 1]['priceRetail'] = +i['return_amount'] * (+i['retail_amount']);
+                products[products.length - 1]['logic'] = i['delivery_rub'];
+                products[products.length - 1]['priceBuy'] = +i['retail_price'];
+                let Product = await productDB.getByArticleOrder(nm_id);
+                products[products.length - 1]['price'] = Product['price'] - ((+Product['price'] * i['product_discount_for_report']) / 100);
+
+                products[products.length - 1]['img'] = `https://images.wbstatic.net/c246x328/new/${Math.floor(+nm_id / 10000)}0000/${nm_id}-1.jpg`
+                products[products.length - 1]['discount'] = i['product_discount_for_report'];
+                products[products.length - 1]['penalty'] = i['penalty'];
+                products[products.length - 1]['owner'] = i['sa_name'];
+                products[products.length - 1]['size'] = i['ts_name'];
+                products[products.length - 1]['srid'] = i['srid'];
+                //sa_name
+
+            }
+            await productDB.addAnalyze(i['task1'], products);
+            await userDB.setUserSaves(i['task1'], 3);
+
+            }
     }
 }
 

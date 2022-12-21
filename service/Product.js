@@ -61,7 +61,7 @@ class Product {
         if(!product){
             return false;
         }
-        productList['image'] = `https://images.wbstatic.net/c246x328/new/${String(article).slice(0,4)}0000/${String(article)}-1.jpg`
+        productList['image'] = `https://images.wbstatic.net/c246x328/new/${Math.floor(+article / 10000)}0000/${String(article)}-1.jpg`
         productList['brand'] = product['selling']['brand_name'];
         productList['article'] = String(article);
         productList['price'] = +product2['data']['products'][0]['salePriceU'] / 100;

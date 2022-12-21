@@ -64,6 +64,24 @@ class User {
         return answer[0];
     }
 
+    async getAll(){
+        let sqlScript = `SELECT * FROM \`user\` `;
+        let answer = await connection.query(sqlScript);
+
+        return answer[0];
+    }
+
+    async refreshUserProduct(task1){
+        let sqlScript = `DELETE FROM update_data WHERE \`type\` = ${task1}`;
+        await connection.query(sqlScript);
+        sqlScript = `DELETE FROM \`order\` WHERE task1 = ${task1}`;
+        await connection.query(sqlScript);
+        sqlScript = `DELETE FROM \`seller\` WHERE task1 = ${task1}`;
+        await connection.query(sqlScript);
+        sqlScript = `DELETE FROM \`analyze\` WHERE task1 = ${task1}`;
+        await connection.query(sqlScript);
+    }
+
 }
 
 module.exports = new User();
