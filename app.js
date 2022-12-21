@@ -21,7 +21,7 @@ app.use(errorMW);
 const start = async () => {
     try {
         let task = cron.schedule('*/10 * * * *', async () => {
-            await product.refreshDB();
+            //await product.refreshDB();
             console.log('Running a job at 01:00 at America/Sao_Paulo timezone');
         }, {
             scheduled: true,
