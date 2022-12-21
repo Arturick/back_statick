@@ -584,6 +584,21 @@ class product{
 
             }
     }
+
+    async getMinus(task1){
+        if(!task1){
+            console.log(403);
+        }
+        let answer = await productDB.getMinus(task1);
+
+        return answer;
+    }
+
+    async addMinus(task1, value, isNumber, allTime, old, naming){
+        await productDB.addMinus(task1, value, isNumber, allTime, old, naming);
+        return {};
+    }
+
 }
 
 module.exports = new product();

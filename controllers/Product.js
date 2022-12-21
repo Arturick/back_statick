@@ -122,6 +122,34 @@ class Product{
         }
     }
 
+    async getMinus(req, res, next){
+        try {
+            const {task1} = req.body;
+
+            let answer = await service.getMinus(task1);
+            answer = answerModule.product(answer);
+            res.json(answer);
+
+        } catch (e) {
+            console.log(e);
+            next(e);
+        }
+    }
+
+    async addMinus(req, res, next){
+        try {
+            const {task1, value, isNumber, allTime, old, naming} = req.body;
+
+            let answer = await service.addMinus(task1, value, isNumber, allTime, old, naming);
+            answer = answerModule.product(answer);
+            res.json(answer);
+
+        } catch (e) {
+            console.log(e);
+            next(e);
+        }
+    }
+
     async testReport(req, res, next){
         try {
             const {article1, article2, access, task1} = req.body;

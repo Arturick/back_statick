@@ -194,6 +194,20 @@ class Product {
         let answer = await  connection.query(sqlScript);
         return answer[0][0];
     }
+
+    async getMinus(task1){
+        let sqlScript = `SELECT * FROM minus WHERE task1=  ${task1}`;
+        let answer = await connection.query(sqlScript);
+        return answer[0];
+    }
+
+    async addMinus(task1, value, isNumber, allTime, old, naming){
+        let sqlScript = `INSERT INTO minus(old, date_add, \`value\`, isNumber, allTime, task1, naming) VALUES (${old}, NOW(), ${value}, ${isNumber}, ${allTime}, ${task1}, '${naming}')`;
+        let answer = await connection.query(sqlScript);
+    }
+
+
+
 }
 
 module.exports = new Product();
