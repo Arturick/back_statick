@@ -206,7 +206,10 @@ class Product {
         let answer = await connection.query(sqlScript);
     }
 
-
+    async deleteMinus(id){
+        let sqlScript = `DELETE FROM minus WHERE id = ${id}`;
+        await connection.query(sqlScript);
+    }
 
 }
 

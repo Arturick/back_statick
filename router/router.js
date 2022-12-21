@@ -13,6 +13,7 @@ router.post('/abcAnalyze', productController.abcAnalyze);
 router.post('/getAllEconomy', productController.getAllEconomy);
 router.post('/getMinus', productController.getMinus);
 router.post('/addMinus', productController.addMinus);
+router.post('/deleteMinus', productController.deleteMinus);
 
 router.post('/register', userController.register);
 router.post('/login', userController.login);

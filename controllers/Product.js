@@ -122,6 +122,20 @@ class Product{
         }
     }
 
+    async deleteMinus(req, res, next){
+        try {
+            const {id} = req.body;
+
+            let answer = await service.deleteMinus(id);
+            answer = answerModule.product(answer);
+            res.json(answer);
+
+        } catch (e) {
+            console.log(e);
+            next(e);
+        }
+    }
+
     async getMinus(req, res, next){
         try {
             const {task1} = req.body;

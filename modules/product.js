@@ -310,11 +310,11 @@ class product{
         console.log(products);
         let names =  products.filter(i => {
 
-            return  !+i.replace(' ', '' && i!= '—' && i!='');
+            return  !+i.replace(' ', '') && i!= '—' && i!='';
         });
         let numbers = products.filter(i => {
 
-            return  +i.replace(' ', '') || i == '—';
+            return  +i.replace(' ', '').replace(' ', '').replace(' ', '') || i == '—';
         });
         console.log(names, numbers);
         for(let i in names){
@@ -593,6 +593,11 @@ class product{
 
         return answer;
     }
+
+    async deleteMinus(id){
+        await productDB.deleteMinus(id);
+    }
+
 
     async addMinus(task1, value, isNumber, allTime, old, naming){
         await productDB.addMinus(task1, value, isNumber, allTime, old, naming);
