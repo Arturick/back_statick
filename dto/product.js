@@ -41,7 +41,7 @@ class Product {
         let sqlScript = ``;
         await this.clear(task1, 3);
         for(let i of products){
-            sqlScript = `INSERT INTO \`analyze\` (brand, task1, article, discount, price, naming, date_report, retail_price, img, count_report, total_price, barcode, size_product, retail_count, logic, com_wb, penalty, owner_article,  count_buy, srid) VALUES('${i['brand']}', ${task1}, '${i['article']}', ${i['discount']}, ${i['price']}, '${i['naming']}', ${i['date']}, ${i['price']}, '${i['img']}', 1, ${i['priceBuy']}, ${i['barcode']}, '${i['size']}',   ${i['countRetail']}, ${i['logic']}, 1000, ${i['penalty']}, '${i['owner']}', ${i['countBuy']}, '${i['srid']}')`;
+            sqlScript = `INSERT INTO \`analyze\` (brand, task1, article, discount, price, naming, date_report, retail_price, img, count_report, total_price, barcode, size_product, retail_count, logic, com_wb, penalty, owner_article,  count_buy, srid) VALUES('${i['brand']}', ${task1}, '${i['article']}', ${i['discount']}, ${i['price']}, '${i['naming']}', ${i['date']}, ${i['price']}, '${i['img']}', 1, ${i['priceBuy']}, '${i['barcode']}', '${i['size']}',   ${i['countRetail']}, ${i['logic']}, 1000, ${i['penalty']}, '${i['owner']}', ${i['countBuy']}, '${i['srid']}')`;
             await connection.query(sqlScript);
         }
     }
@@ -211,6 +211,37 @@ class Product {
         await connection.query(sqlScript);
     }
 
+    async getAllSellerDiagram(task1){
+        let sqlScript = `SELECT COUNT(*) as cnt, SUM(price) as totalPr FROM \`seller\` WHERE task1 = ${task1}`;
+        let answer = await connection.query(sqlScript);
+        return answer[0];
+    }
+
+    async getBySrid(srid){
+        let sqlScript = `SELECT * FROM \`seller\` WHERE srid = '${srid}'`;
+        let answer = await connection.query(sqlScript);
+        return answer[0];
+    }
+
+    async getAllOrderDiagram(task1){
+        let sqlScript = `SELECT COUNT(*) as cnt, SUM(price) as totalPr FROM \`order\` WHERE task1 = ${task1}`;
+        let answer = await connection.query(sqlScript);
+        return answer[0];
+    }
+
+    async getAllOrder(task1){
+        let sqlScript = `SELECT * FROM \`order\` WHERE task1 = ${task1}`;
+        let answer = await connection.query(sqlScript);
+        return answer[0];
+    }
+
+    async getAllRetail(task1){
+        let sqlScript = `SELECT COUNT(*) as cnt, SUM(price) as prt FROM \`analyze\` WHERE task1 = ${task1} AND retail_count != 0`;
+
+        let answer = await connection.query(sqlScript);
+
+        return answer[0];
+    }
 }
 
 module.exports = new Product();

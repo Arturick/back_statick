@@ -14,6 +14,9 @@ router.post('/getAllEconomy', productController.getAllEconomy);
 router.post('/getMinus', productController.getMinus);
 router.post('/addMinus', productController.addMinus);
 router.post('/deleteMinus', productController.deleteMinus);
+router.post('/getSellerDiagram', productController.getAllSellerDiagram);
+router.post('/getOrderDiagram', productController.getAllOrderDiagram);
+router.post('/getAllRetail', productController.getAllRetail);
 
 router.post('/register', userController.register);
 router.post('/login', userController.login);

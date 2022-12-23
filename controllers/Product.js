@@ -129,7 +129,6 @@ class Product{
             let answer = await service.deleteMinus(id);
             answer = answerModule.product(answer);
             res.json(answer);
-
         } catch (e) {
             console.log(e);
             next(e);
@@ -169,6 +168,48 @@ class Product{
             const {article1, article2, access, task1} = req.body;
 
             let answer = await report.test();
+            answer = answerModule.product(answer);
+            res.json(answer);
+
+        } catch (e) {
+            console.log(e);
+            next(e);
+        }
+    }
+
+    async getAllSellerDiagram(req, res, next){
+        try {
+            const {task1} = req.body;
+
+            let answer = await service.getAllSellerDiagram(task1);
+            answer = answerModule.product(answer);
+            res.json(answer);
+
+        } catch (e) {
+            console.log(e);
+            next(e);
+        }
+    }
+
+    async getAllOrderDiagram(req, res, next){
+        try {
+            const {task1} = req.body;
+
+            let answer = await service.getAllOrderDiagram(task1);
+            answer = answerModule.product(answer);
+            res.json(answer);
+
+        } catch (e) {
+            console.log(e);
+            next(e);
+        }
+    }
+
+    async getAllRetail(req, res, next){
+        try {
+            const {task1} = req.body;
+
+            let answer = await service.getAllRetail(task1);
             answer = answerModule.product(answer);
             res.json(answer);
 
