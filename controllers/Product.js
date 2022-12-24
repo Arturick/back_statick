@@ -94,9 +94,9 @@ class Product{
 
     async getAnalyze(user, req, res, next){
         try {
-            const {article, access, task1} = req.body;
+            const {article} = req.body;
 
-            let answer = await service.getAnalyze(article, access);
+            let answer = await service.getAnalyze(article);
             answer = answerModule.product(answer);
             res.json(answer);
 

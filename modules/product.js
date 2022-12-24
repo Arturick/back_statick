@@ -358,10 +358,8 @@ class product{
         return wordsList;
     }
 
-    async getAnalyze(article, access){
-        if(!access | !article){
+    async getAnalyze(article){
 
-        }
         //authValidate(access, 1111);
         let options = new chrome.Options();
         options.addArguments(['--no-sandbox', '--headless', '—disable-gpu', '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36']);
