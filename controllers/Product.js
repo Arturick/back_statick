@@ -2,11 +2,10 @@ const service = require('../modules/product');
 const answerModule = require('../service/Answer');
 const report = require('../modules/report');
 class Product{
-    async sellers(req, res, next){
+    async sellers(user, req, res, next){
         try {
-            const { graph, dateFrom, flag, type, access, task1, article, date} = req.body;
-            console.log(access);
-            let answer = await service.seller(graph, dateFrom, flag, type, access, task1, article, date);
+            const { graph, dateFrom, flag, type, article, date} = req.body;
+            let answer = await service.seller(user, dateFrom,  graph,  flag, type, article, date);
             answer = answerModule.product(answer);
             res.json(answer)
 
@@ -17,11 +16,11 @@ class Product{
     }
 
 
-    async order(req, res, next){
+    async order(user, req, res, next){
         try {
-            const {graph, dateFrom, flag, type, access, task1, article, date} = req.body;
-            console.log(access);
-            let answer = await service.order(graph, dateFrom, flag, type, access, task1, article, date);
+            const {dateFrom, graph,  flag, type, article, date} = req.body;
+
+            let answer = await service.order(user, dateFrom, graph,  flag, type, article, date);
             answer = answerModule.product(answer);
             res.json(answer);
 
@@ -33,11 +32,11 @@ class Product{
     }
 
 
-    async reportSeller(req, res, next){
+    async reportSeller(user, req, res, next){
         try {
-            const {type, article, access, task1} = req.body;
+                const {type, article} = req.body;
 
-            let answer = await service.reportSeller(type, article, access, task1);
+            let answer = await service.reportSeller(user, type, article);
             answer = answerModule.product(answer);
             res.json(answer);
 
@@ -48,11 +47,11 @@ class Product{
         }
     }
 
-    async getAllEconomy(req, res, next){
+    async getAllEconomy(user, req, res, next){
         try {
-            const {access} = req.body;
 
-            let answer = await service.getAllEconomy(access);
+
+            let answer = await service.getAllEconomy(user['task1']);
             answer = answerModule.product(answer);
             res.json(answer);
 
@@ -62,11 +61,10 @@ class Product{
             next(e);
         }
     }
-    async abcAnalyze(req, res, next){
+    async abcAnalyze(user, req, res, next){
         try {
-            const {task1, access} = req.body;
 
-            let answer = await service.abcAnalyze(task1, access);
+            let answer = await service.abcAnalyze(user);
             answer = answerModule.product(answer);
             res.json(answer);
 
@@ -79,7 +77,7 @@ class Product{
 
 
 
-    async getByArticle(req, res, next){
+    async getByArticle(user, req, res, next){
         try {
             const {article} = req.body;
 
@@ -94,7 +92,7 @@ class Product{
         }
     }
 
-    async getAnalyze(req, res, next){
+    async getAnalyze(user, req, res, next){
         try {
             const {article, access, task1} = req.body;
 
@@ -108,7 +106,7 @@ class Product{
         }
     }
 
-    async getCompetition(req, res, next){
+    async getCompetition(user, req, res, next){
         try {
             const {article1, article2, access, task1} = req.body;
 
@@ -122,7 +120,7 @@ class Product{
         }
     }
 
-    async deleteMinus(req, res, next){
+    async deleteMinus(user, req, res, next){
         try {
             const {id} = req.body;
 
@@ -135,7 +133,7 @@ class Product{
         }
     }
 
-    async getMinus(req, res, next){
+    async getMinus(user, req, res, next){
         try {
             const {task1} = req.body;
 
@@ -149,7 +147,7 @@ class Product{
         }
     }
 
-    async addMinus(req, res, next){
+    async addMinus(user, req, res, next){
         try {
             const {task1, value, isNumber, allTime, old, naming} = req.body;
 
@@ -163,7 +161,7 @@ class Product{
         }
     }
 
-    async testReport(req, res, next){
+    async testReport(user, req, res, next){
         try {
             const {article1, article2, access, task1} = req.body;
 
@@ -177,11 +175,9 @@ class Product{
         }
     }
 
-    async getAllSellerDiagram(req, res, next){
+    async getAllSellerDiagram(user, req, res, next){
         try {
-            const {task1} = req.body;
-
-            let answer = await service.getAllSellerDiagram(task1);
+            let answer = await service.getAllSellerDiagram(user['task1']);
             answer = answerModule.product(answer);
             res.json(answer);
 
@@ -191,11 +187,11 @@ class Product{
         }
     }
 
-    async getAllOrderDiagram(req, res, next){
+    async getAllOrderDiagram(user, req, res, next){
         try {
-            const {task1} = req.body;
 
-            let answer = await service.getAllOrderDiagram(task1);
+
+            let answer = await service.getAllOrderDiagram(user['task1']);
             answer = answerModule.product(answer);
             res.json(answer);
 
@@ -205,11 +201,10 @@ class Product{
         }
     }
 
-    async getAllRetail(req, res, next){
+    async getAllRetail(user, req, res, next){
         try {
-            const {task1} = req.body;
 
-            let answer = await service.getAllRetail(task1);
+            let answer = await service.getAllRetail(user['task1']);
             answer = answerModule.product(answer);
             res.json(answer);
 

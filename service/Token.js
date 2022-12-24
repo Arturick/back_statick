@@ -1,11 +1,11 @@
 const jwt = require('jsonwebtoken');
 const tokenDB = require('../dto/token');
-
+const salt_config = require('../src/config').jwt;
 
 class Token {
-    generateTokens(payload) {
-        const accessToken = jwt.sign({payload: payload}, 'salt', {expiresIn: '24h'})
-        const refreshToken = jwt.sign({payload: payload}, 'salt', {expiresIn: '48h'})
+    generateTokens(userId) {
+        const accessToken = jwt.sign({payload: userId}, salt_config.accessSalt, {expiresIn: '24h'})
+        const refreshToken = jwt.sign({payload: userId}, salt_config.refreshSalt, {expiresIn: '148h'})
         return {
             access: accessToken,
             refresh: refreshToken
@@ -14,7 +14,7 @@ class Token {
 
     validateAccessToken(token) {
         try {
-            const userData = jwt.verify(token, 'salt');
+            const userData = jwt.verify(token, salt_config.accessSalt);
             return userData;
         } catch (e) {
             return null;
@@ -23,30 +23,34 @@ class Token {
 
     validateRefreshToken(token) {
         try {
-            const userData = jwt.verify(token, 'salt');
+            const userData = jwt.verify(token, salt_config.refreshSalt);
             return userData;
         } catch (e) {
             return null;
         }
     }
 
-    async saveToken(task1, refreshToken) {
-        const tokenData = await tokenDB.checkToken(task1, refreshToken);
-        if (tokenData['cnt'] > 0) {
-            return tokenData.updateToken(task1, refreshToken);
+    async saveToken(userId, refreshToken) {
+        const tokenData = await tokenDB.checkToken(userId);
+        console.log(tokenData);
+        if (tokenData.length > 0) {
+            await tokenDB.deleteTokenById(userId);
         }
-        const token = await tokenDB.createToken(task1, refreshToken);
+        const token = await tokenDB.createToken(userId, refreshToken);
         return token;
     }
 
-    async removeToken(task1, refreshToken) {
-        const tokenData = await tokenDB.deleteToken(task1, refreshToken);
+    async removeToken(userId) {
+        const tokenData = await tokenDB.deleteTokenById(userId);
         return tokenData;
     }
 
-    async findToken(task1, refreshToken) {
-        const tokenData = await tokenDB.getToken(task1, refreshToken);
-        return tokenData;
+    async findToken(userId) {
+        const tokenData = await tokenDB.getToken(userId);
+        if(tokenData.length < 1){
+            return null
+        }
+        return tokenData[0];
     }
 }
 

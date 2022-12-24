@@ -27,16 +27,17 @@ function authValidate(token, task1){
     }
 }
 class product{
-    async seller(graph = false, dateFrom, flag = false, type = 0, access, task1 = 1111, article = false, date = false){
+    async seller(user, dateFrom,  graph = false,  flag = false, type = 0, article = false, date = false){
+        console.log(user);
         if(!dateFrom){
             throw apiError.BadRequest(errorText.reqData);
         }
-        task1 = 1111;
         // authValidate(access, task1);
-        let token = await userDB.getUserByTask1(task1);
-        let lasUpdates = await userDB.getUserSaves(1, task1);
-        token = token[0]['token'];
-        console.log(type);
+
+
+        let lasUpdates = await userDB.getUserSaves(1, user['id']);
+        let token = user['token'];
+
         if(lasUpdates.length < 1){
 
             let response,
@@ -46,7 +47,8 @@ class product{
             if(token.length < 70){
                 response = await axios.get(`https://suppliers-stats.wildberries.ru/api/v1/supplier/sales?dateFrom=2022-11-01&key=${token}`)
 
-            } else {
+            }
+            else {
                 let config = {
                     headers: {
                         Authorization: token
@@ -55,11 +57,10 @@ class product{
                 response = await axios.get(`https://statistics-api.wildberries.ru/api/v1/supplier/sales?dateFrom=2022-11-01`, config);
 
             }
-            console.log(response);
+
             for( let i of response.data){
                 let date = String(i['date']).split('T')[0];
                 products.push({});
-                let pr = await productDB.getByArticleOrder(i['nmId']);
                 products[products.length - 1]['discount'] = i['discountPercent'];
                 products[products.length - 1]['naming'] = i['subject'];
                 products[products.length - 1]['brand'] = i['brand'];
@@ -67,15 +68,15 @@ class product{
                 products[products.length - 1]['article'] = i['nmId'];
                 products[products.length - 1]['srid'] = i['srid'];
                 products[products.length - 1]['date'] = date;
-                products[products.length - 1]['img'] = `https://images.wbstatic.net/c246x328/new/${String(products[products.length - 1]['article']).slice(0, 5)}0000/${String(products[products.length - 1]['article'])}-1.jpg`;
+                products[products.length - 1]['img'] = `https://images.wbstatic.net/c246x328/new/${Math.floor(+products[products.length - 1]['article'] / 10000)}0000/${String(products[products.length - 1]['article'])}-1.jpg`;
                 products[products.length - 1]['barcode'] = i['barcode'];
                 products[products.length - 1]['category'] = i['category'];
                 products[products.length - 1]['size'] = i['techSize'];
                 products[products.length - 1]['region'] = i['oblast'];
                 products[products.length - 1]['pwz'] = i['warehouseName'];
             }
-            await productDB.addSeller(task1, products);
-            await userDB.setUserSaves(task1, 1);
+            await productDB.addSeller(user['task1'], products);
+            await userDB.setUserSaves(user['id'], 1);
             answer.count = countProduct;
             answer.total = totalPrice;
 
@@ -87,7 +88,7 @@ class product{
 
         let productList = product['products'];
         if(article){
-            productList = await productDB.getByArticleDateSeller(task1, article, date);
+            productList = await productDB.getByArticleDateSeller(user['task1'], article, date);
             productList = productList.filter(i => {
                 console.log(new Date(date).getTime() ==  i['date_seller'].getTime());
                 return new Date(date).getTime() ==  i['date_seller'].getTime();
@@ -95,12 +96,11 @@ class product{
             console.log(productList);
         }
         if(!graph && !article){
-            console.log('xxxx');
-            product = await productDB.getSeller(1111, type);
+            product = await productDB.getSeller(user['task1'], type);
             productList = product['products'];
         } else {
             if(graph){
-                product = await productDB.getSellerGraph(1111, article);
+                product = await productDB.getSellerGraph(user['task1'], article);
                 productList = product['products'];
             }
 
@@ -109,16 +109,15 @@ class product{
         return  answer;
     }
 
-    async order(graph = false, dateFrom, flag = false, type = 0, access, task1=1111, article = false, date = false){
-        task1 = 1111;
-        console.log(graph);
+    async order(user, dateFrom, graph = false,  flag = false, type = 0, article = false, date = false){
+
         if(!dateFrom){
             throw apiError.BadRequest(errorText.reqData);
         }
         //authValidate(access, task1);
-        let token = await userDB.getUserByTask1(task1);
-        let lasUpdates = await userDB.getUserSaves (2, task1);
-        token = token[0]['token'];
+        let token = user['token'];
+        let lasUpdates = await userDB.getUserSaves(2, user['id']);
+        console.log(123);
         if(lasUpdates.length < 1){
             let products = [];
 
@@ -133,7 +132,8 @@ class product{
                 }
                 response = await axios.get(`https://statistics-api.wildberries.ru/api/v1/supplier/orders?dateFrom=2022-11-01`, config);
             }
-            response.data.map(async i => {
+
+            for(let i of response.data) {
 
                 products.push({});
                 products[products.length - 1]['img'] = `https://images.wbstatic.net/c246x328/new/${String(i['nmId']).slice(0, 5)}0000/${String(i['nmId'])}-1.jpg`
@@ -150,9 +150,9 @@ class product{
                 products[products.length - 1]['region'] = i['oblast'];
                 products[products.length - 1]['pwz'] = i['warehouseName'];
 
-            });
-            await productDB.addOrder(task1, products);
-            await userDB.setUserSaves(task1, 2);
+            };
+            await productDB.addOrder(user['task1'], products);
+            await userDB.setUserSaves(user['id'], 2);
         }
         let product = [];
         let productList = [];
@@ -160,20 +160,18 @@ class product{
 
 
         if(article){
-            productList = await productDB.getByArticleDateOrder(task1, article, date);
-
+            productList = await productDB.getByArticleDateOrder(user['task1'], article, date);
             productList = productList.filter(i => {
-
+                console.log(new Date(date).getTime() ==  i['date_seller'].getTime());
                 return new Date(date).getTime() ==  i['date_seller'].getTime();
             });
-            console.log(productList);
         }
         if(!graph && !article){
-            product = await productDB.getOrder(1111, type);
+            product = await productDB.getOrder(user['task1'], type);
             productList = product['products'];
         } else {
             if(graph){
-                product = await productDB.getOrderGraph(1111, article);
+                product = await productDB.getOrderGraph(user['task1'], article);
                 productList = product['products'];
                 console.log(productList);
             }
@@ -183,20 +181,19 @@ class product{
         return  answer;
     }
 
-    async reportSeller(type, article = false, access, task1){
-        console.log(access);
+    async reportSeller(user, type, article = false,){
+
         if(!type){
             throw apiError.BadRequest(errorText.reqData);
         }
-        authValidate(access, task1);
-        console.log(1212121212);
-        let token = await userDB.getUserByTask1(task1);
-        let lasUpdates = await userDB.getUserSaves( 3, task1);
-        token = token[0]['token'];
+
+
+        let lasUpdates = await userDB.getUserSaves( 3, user['id']);
+        let token = user['token'];
         if(lasUpdates.length < 1){
             let products = [];
 
-            let localDate = new Date(new Date().getTime() - (40 *86400000));
+            let localDate = new Date(new Date().getTime() - (29 *86400000));
             let today = new Date();
             localDate = `${localDate.getFullYear()}-${localDate.getMonth() + 1}-${localDate.getDate()}`;
             today= `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
@@ -222,16 +219,13 @@ class product{
                 products[products.length - 1]['brand'] = i['brand_name'];
                 products[products.length - 1]['article'] = nm_id;
                 products[products.length - 1]['barcode'] = i['barcode'];
-                let countProduct = await productDB.getByArticleSeller(nm_id);
-                products[products.length - 1]['countBuy'] = +countProduct['cnt'];
+                products[products.length - 1]['countBuy'] = +i['quantity'];
                 products[products.length - 1]['countRetail'] = +i['return_amount'];
                 products[products.length - 1]['priceRetail'] = +i['return_amount'] * (+i['retail_amount']);
                 products[products.length - 1]['logic'] = i['delivery_rub'];
                 products[products.length - 1]['priceBuy'] = +i['retail_price'];
-                let Product = await productDB.getByArticleOrder(nm_id);
-                products[products.length - 1]['price'] = Product['price'] - ((+Product['price'] * i['product_discount_for_report']) / 100);
-
-                products[products.length - 1]['img'] = `https://images.wbstatic.net/c246x328/new/${nm_id.slice(0, 5)}0000/${nm_id}-1.jpg`
+                products[products.length - 1]['price'] = +i['retail_price'] - ((+i['retail_price'] * i['product_discount_for_report']) / 100);
+                products[products.length - 1]['img'] = `https://images.wbstatic.net/c246x328/new/${Math.floor(+nm_id / 10000)}0000/${nm_id}-1.jpg`
                 products[products.length - 1]['discount'] = i['product_discount_for_report'];
                 products[products.length - 1]['penalty'] = i['penalty'];
                 products[products.length - 1]['owner'] = i['sa_name'];
@@ -240,12 +234,12 @@ class product{
                 //sa_name
 
             }
-            await productDB.addAnalyze(task1, products);
-            await userDB.setUserSaves(task1, 3);
+            await productDB.addAnalyze(user['task1'], products);
+            await userDB.setUserSaves(user['id'], 3);
         }
-        let product = await productDB.getAnalyze(task1, type, article);
+        let product = await productDB.getAnalyze(user['task1'], type, article);
         answer = {products: product['products'], count: product['cnt'], total: product['total']};
-        let response;
+
 
 
 
@@ -471,12 +465,9 @@ class product{
         return answer;
     }
 
-    async getAllEconomy(access){
-        if(!access){
-            throw apiError.BadRequest(errorText.reqData);
-        }
-        authValidate(access, 1111); // pockachto
-        let product = await productDB.getEconomyAll();
+    async getAllEconomy(task1){
+
+        let product = await productDB.getEconomyAll(task1);
 
         answer = {products: product};
         return  answer;
@@ -488,18 +479,16 @@ class product{
         return product;
     }
 
-    async abcAnalyze(task1, access){
-        if(!task1 || !access){
-            //throw apiError.BadRequest(errorText.reqData);
-        }
+    async abcAnalyze(user){
+
         //authValidate(access, 1111);
         let analyzeData = {
             a: {totalSum: 0, prs: 0, cnt: 0},
             b: {totalSum: 0, prs: 0, cnt: 0},
             c: {totalSum: 0, prs: 0, cnt: 0},
         }
-        let product = await productDB.abcGet(1111),
-            totalSum = await productDB.getTotalPriceAnalyze(1111);
+        let product = await productDB.abcGet(user['task1']),
+            totalSum = await productDB.getTotalPriceAnalyze(user['task1']);
 
         product.sort((a, b) => {
             return (+b.cnt * +b.price) - (+a.cnt * +a.price);
@@ -674,11 +663,15 @@ class product{
     async getAllOrderDiagram(task1){
         let answer = {total: 0, cnt: 0, retailTotal: 0, retailCnt: 0};
         let product = await productDB.getAllOrder(task1);
+        let seller = await productDB.getSellerAll(task1);
+        let sridAlready = [];
+        for(let i of seller){
+            sridAlready.push(i['srid']);
+        }
         for(let i of product){
             answer.total += i['price'];
             answer.cnt +=1;
-            let rt = await productDB.getBySrid(i['srid']);
-            if(rt.length < 1){
+            if(sridAlready.indexOf(i['srid'])  < 0){
                 answer.retailTotal += i['price'];
                 answer.retailCnt +=1;
             }

@@ -115,8 +115,8 @@ class Product {
         answer['cnt'] = answer['cnt'][0];
         return answer;
     }
-    async getEconomyAll(){
-        let sqlScript = `SELECT *, COUNT(*) as cntBuy, SUM(price) as totalBuy , SUM(retail_price) as rtp, SUM(retail_count) as countRetail,  SUM(price), SUM(logic) as lg, SUM(penalty) as pnt FROM \`analyze\` GROUP by article`
+    async getEconomyAll(task1){
+        let sqlScript = `SELECT *, COUNT(*) as cntBuy, SUM(price) as totalBuy , SUM(retail_price) as rtp, SUM(retail_count) as countRetail,  SUM(price), SUM(logic) as lg, SUM(penalty) as pnt FROM \`analyze\` WHERE task1 = ${task1} GROUP by article`
 
         let answer = await connection.query(sqlScript);
         return answer[0];
@@ -164,8 +164,14 @@ class Product {
     async getByArticleDateOrder(task1, article, date){
         let sqlScript = `SELECT * FROM \`order\` WHERE task1=${task1} AND article = '${article}'`;
         let answer = await connection.query(sqlScript);
+        return answer[0];
+    }
 
-        return answer[0]
+    async getSellerAll(task1){
+        let sqlScript = `SELECT * FROM \`seller\` WHERE task1 = ${task1}`;
+        let answer = await connection.query(sqlScript);
+
+        return answer[0];
     }
 
 
@@ -236,7 +242,7 @@ class Product {
     }
 
     async getAllRetail(task1){
-        let sqlScript = `SELECT COUNT(*) as cnt, SUM(price) as prt FROM \`analyze\` WHERE task1 = ${task1} AND retail_count != 0`;
+        let sqlScript = `SELECT COUNT(*) as cnt, SUM(penalty) as prt FROM \`analyze\` WHERE task1 = ${task1} AND retail_count != 0`;
 
         let answer = await connection.query(sqlScript);
 

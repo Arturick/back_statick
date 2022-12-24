@@ -8,7 +8,7 @@ class User {
 
             let answer = await service.register(login, email, password);
             res.cookie('refreshToken', answer['tokens']['refresh'], {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true})
-            answer = answerModule.register(answer);
+            answer = answerModule.auth(answer);
             res.json(answer);
 
         } catch (e) {
@@ -23,7 +23,7 @@ class User {
 
             let answer = await service.login(login, password);
             res.cookie('refreshToken', answer['tokens']['refresh'], {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true})
-            answer = answerModule.register(answer);
+            answer = answerModule.auth(answer);
             res.json(answer);
 
         } catch (e) {
@@ -34,9 +34,9 @@ class User {
 
     async logout(req, res, next){
         try {
-            const {task1} = req.body;
+            const {userId} = req.body;
             const {refreshToken} = req.cookies;
-            await service.logout(task1, refreshToken);
+            await service.logout(userId, refreshToken);
             res.clearCookie('refreshToken');
             res.json({});
 
@@ -48,35 +48,35 @@ class User {
 
     async refresh(req, res, next){
         try {
-            const {task1} = req.body;
+            const {userId} = req.body;
             const {refreshToken} = req.cookies;
             console.log(req.cookies);
-            let answer = await service.refresh(task1, refreshToken);
+            let answer = await service.refresh(userId, refreshToken);
             res.cookie('refreshToken', answer['tokens']['refresh'], {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true})
-            answer = answerModule.register(answer);
+            answer = answerModule.auth(answer);
             return res.json(answer);
         } catch (e) {
             next(e);
         }
     }
 
-    async updateProfile(req, res, next){
+    async updateProfile(user, req, res, next){
         try {
-            const {task1, profile, access} = req.body;
-            let answer = await service.updateProfile(task1, profile, access);
+            const {userNew} = req.body;
+            console.log(1);
+            await service.updateProfile(user, userNew);
 
-            answer = answerModule.default(answer);
-            return res.json(answer);
+            return res.json({});
         } catch (e) {
+            console.log(e);
             next(e);
         }
     }
-    async getUser(req, res, next){
+
+    async getUser(user, req, res, next){
         try {
-            const {task1, access} = req.body;
-            let answer = await service.getProfile(task1, access);
-            answer = answerModule.default(answer);
-            return res.json(answer);
+            console.log(124);
+            return res.json(user);
         } catch (e) {
             next(e);
         }

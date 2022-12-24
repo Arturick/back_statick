@@ -9,17 +9,19 @@ class User {
             throw apiError.BadRequest(errorText.reqData);
         }
         let isAlreadyReg = await userDB.getUserByEmail(email);
-        if (isAlreadyReg[0]['cnt'] > 0) {
-            throw apiError.BadRequest(errorText.emailAlreadyReg);
+        let isAlreadyLog = await userDB.getUserByLogin(login);
+        if (isAlreadyReg.length > 0 || isAlreadyLog.length > 0) {
+            throw apiError.BadRequest('данный емэил или логин уже зарегестрирован');
         }
         let task1 = Math.floor(Math.random() * (1000000000000 - 1000000000)) + 1000000000;
         await userDB.register(task1, login, email, password);
+        isAlreadyLog = await userDB.getUserByLogin(login);
         let answer = {
-            profile: await userDB.getUserByTask1(task1),
+            id: isAlreadyLog[0]['id'],
 
             tokens: await tokenService.generateTokens(task1),
         }
-        await tokenService.saveToken(task1, answer.tokens.refresh);
+        await tokenService.saveToken(isAlreadyLog[0]['id'], answer.tokens.refresh);
         return answer;
     }
 
@@ -28,63 +30,62 @@ class User {
             throw apiError.BadRequest(errorText.reqData);
         }
         let isLog = await userDB.login(login, password);
-        if (isLog[0]['cnt'] < 0) {
-            throw apiError.BadRequest(errorText.emailAlreadyReg);
+        if (isLog.length < 1) {
+            throw apiError.BadRequest('Не верные данные');
         }
 
-        let user = await userDB.getUserByLogin(login);
-        let task1 = user[0]['task1'];
-        console.log(user[0]['task1']);
+        let userId = isLog[0]['id'];
+        console.log(isLog[0]['id']);
         let answer = {
-            profile: user,
+            userId: userId,
 
-            tokens: await tokenService.generateTokens(task1),
+            tokens: await tokenService.generateTokens(userId),
         }
-        await tokenService.saveToken(task1, answer.tokens.refresh);
+        await tokenService.saveToken(userId, answer.tokens.refresh);
         return answer;
 
     }
 
-    async logout(task1, refreshToken){
-        if(!task1 || !refreshToken){
+    async logout(userId){
+        if(userId){
             throw apiError.BadRequest(errorText.reqData);
         }
-        await tokenService.removeToken(task1, refreshToken);
+        await tokenService.removeToken(userId);
+        return {};
     }
 
-    async refresh(task1, refreshToken){
-        if(!task1 || !refreshToken){
+    async refresh(userId, refreshToken){
+        console.log(refreshToken, userId);
+        if((!userId && userId !=0) || !refreshToken){
             throw apiError.BadRequest(errorText.reqData);
         }
-        let isToken = tokenService.findToken(task1, refreshToken);
-        if(isToken.length < 1){
+        let isToken = tokenService.findToken(userId);
+        if(!isToken){
             throw apiError.BadRequest(errorText.errorToken);
         }
-        let user = await userDB.getUserByTask1(task1);
-        let answer = {
-            profile: user,
-
-            tokens: await tokenService.generateTokens(task1),
+        isToken = tokenService.validateRefreshToken(refreshToken);
+        console.log(isToken);
+        if(!isToken || isToken.payload != userId){
+            throw apiError.BadRequest('Нужно войти в профиль');
         }
-        await tokenService.saveToken(task1, answer.tokens.refresh);
+        let answer = {
+            userId: userId,
+            tokens: await tokenService.generateTokens(userId),
+        }
+        await tokenService.saveToken(userId, answer.tokens.refresh);
 
         return answer;
     }
 
-    async updateProfile(task1, profile, access){
-        if(!task1 || !profile || !access){
+    async updateProfile(user, userNew){
+        if(!user  || !userNew){
             throw apiError.BadRequest(errorText.reqData);
         }
-        let isLog = tokenService.validateAccessToken(access);
-        console.log(isLog);
-        if(isLog.payload != +task1){
-            throw apiError.BadRequest(errorText.reqData);
-        }
-        let userNow = await userDB.getUserByTask1(task1);
-        userNow = userNow[0];
-        await userDB.updateProfile(task1, profile);
-        if(profile.token != userNow.token){
-            await userDB.deleteUserSaves(task1);
+
+        await userDB.updateProfile(user['id'], userNew);
+        console.log(11)
+        if(userNew.token != user.token){
+            await userDB.deleteUserSaves(user['id']);
         }
         return {};
     }

@@ -8,24 +8,30 @@ const connection    = mysql.createPool({
 
 class User {
     async register(task1, login, email, password){
-        let sqlScript = `INSERT INTO user(task1, name, email, password) VALUES (${task1}, ${login}, ${email}, ${password})`;
+        let sqlScript = `INSERT INTO user(task1, login, email, password) VALUES (${task1}, '${login}', '${email}', ${password})`;
         await connection.query(sqlScript);
 
     }
     async login(login, password){
-        let sqlScript = `SELECT COUNT(*) as cnt FROM user t WHERE t.name = "${login}" AND password = '${password}'`;
+        let sqlScript = `SELECT * FROM \`user\` t WHERE login = "${login}" AND password = "${password}"`;
         let answer = await connection.query(sqlScript);
-
         return answer[0];
     }
 
-    async updateProfile(task1, profile){
-        let sqlScript = `UPDATE user t SET t.name = "${profile['name']}", surname = '${profile['surname']}', token = '${profile['token']}'`
+    async updateProfile(userId, profile){
+        let sqlScript = `UPDATE user t SET t.name = "${profile['name']}", surname = '${profile['surname']}', token = '${profile['token']}' WHERE id = ${userId}`
 
-        let answer = await connection.query(sqlScript);
+        await connection.query(sqlScript);
     }
     async getUserByEmail(email){
-        let sqlScript = `SELECT COUNT(*) as cnt FROM user WHERE email = '${email}'`
+        let sqlScript = `SELECT * FROM user WHERE email = '${email}'`
+        let answer = await connection.query(sqlScript);
+
+        return answer[0]
+    }
+    async getUserByLogin(login){
+        let sqlScript = `SELECT * FROM user WHERE login = '${login}'`
+        console.log(sqlScript);
         let answer = await connection.query(sqlScript);
 
         return answer[0]
@@ -37,28 +43,22 @@ class User {
         return answer[0]
     }
 
-    async getUserByLogin(login){
-        let sqlScript = `SELECT *  FROM user t WHERE t.name = "${login}"`
-        let answer = await connection.query(sqlScript);
 
-        return answer[0]
-    }
-
-    async getUserSaves(task1, type){
-        let sqlScript = `SELECT *  FROM update_data t WHERE task1 = "${task1}" AND t.type = ${type}`;
+    async getUserSaves(userId, type){
+        let sqlScript = `SELECT *  FROM update_data t WHERE userId = ${userId} AND t.type = ${type}`;
         let answer = await connection.query(sqlScript);
         return answer[0];
     }
 
-    async setUserSaves(task1, type){
-        let sqlScript = `INSERT INTO update_data (type, task1, update_date) VALUES (${task1}, ${type}, NOW())`;
+    async setUserSaves(userId, type){
+        let sqlScript = `INSERT INTO update_data (type, userId, update_date) VALUES (${userId}, ${type}, NOW())`;
         let answer = await connection.query(sqlScript);
 
         return answer[0];
     }
 
-    async deleteUserSaves(task1){
-        let sqlScript = `DELETE update_data WHERE task1 = ${task1}`;
+    async deleteUserSaves(userId){
+        let sqlScript = `DELETE FROM update_data WHERE userId = ${userId}`;
         let answer = await connection.query(sqlScript);
 
         return answer[0];
@@ -80,6 +80,17 @@ class User {
         await connection.query(sqlScript);
         sqlScript = `DELETE FROM \`analyze\` WHERE task1 = ${task1}`;
         await connection.query(sqlScript);
+    }
+
+    async getUserById(id) {
+        let sqlScript = `SELECT * FROM user WHERE id = ${id}`;
+
+        let answer = await connection.query(sqlScript);
+
+        if (answer[0].length < 0) {
+            throw Error('user not found')
+        }
+        return answer[0][0];
     }
 
 }

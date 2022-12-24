@@ -6,11 +6,11 @@ class Answer {
         return answer;
     }
 
-    register(data){
-        let answer = {}
+    auth(data){
+        let answer = data;
         answer.success = true;
-        answer.profile = data['profile'];
-        answer.token = data['tokens']['access'];
+        answer.access = answer.tokens.access;
+        delete answer.tokens;
         return answer;
     }
 
