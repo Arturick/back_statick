@@ -426,9 +426,9 @@ class product{
                 let num = data[index].split('\n');
                 let num2 = data[1 + index].split('\n');
                 if (num[0] > num2[0]) {
-                    data[index] = `${num[0]}<span class="arr_red">⬇</span>${num[1]}`;
+                    data[index] = `${num[0]}⬇${num[1]}`;
                 } else {
-                    data[index] = `${num[0]}<span class="arr_green">⬆</span>${num[1]}`;
+                    data[index] = `${num[0]}⬆${num[1]}`;
 
                 }
             }
