@@ -58,24 +58,7 @@ class product{
 
             }
 
-            for( let i of response.data){
-                let date = String(i['date']).split('T')[0];
-                products.push({});
-                products[products.length - 1]['discount'] = i['discountPercent'];
-                products[products.length - 1]['naming'] = i['subject'];
-                products[products.length - 1]['brand'] = i['brand'];
-                products[products.length - 1]['price'] = i['forPay'];
-                products[products.length - 1]['article'] = i['nmId'];
-                products[products.length - 1]['srid'] = i['srid'];
-                products[products.length - 1]['date'] = date;
-                products[products.length - 1]['img'] = `https://images.wbstatic.net/c246x328/new/${Math.floor(+products[products.length - 1]['article'] / 10000)}0000/${String(products[products.length - 1]['article'])}-1.jpg`;
-                products[products.length - 1]['barcode'] = i['barcode'];
-                products[products.length - 1]['category'] = i['category'];
-                products[products.length - 1]['size'] = i['techSize'];
-                products[products.length - 1]['region'] = i['oblast'];
-                products[products.length - 1]['pwz'] = i['warehouseName'];
-            }
-            await productDB.addSeller(user['task1'], products);
+            await productDB.addSeller(user['task1'], response.data);
             await userDB.setUserSaves(user['id'], 1);
             answer.count = countProduct;
             answer.total = totalPrice;
@@ -133,25 +116,7 @@ class product{
                 response = await axios.get(`https://statistics-api.wildberries.ru/api/v1/supplier/orders?dateFrom=2022-11-01`, config);
             }
 
-            for(let i of response.data) {
-
-                products.push({});
-                products[products.length - 1]['img'] = `https://images.wbstatic.net/c246x328/new/${String(i['nmId']).slice(0, 5)}0000/${String(i['nmId'])}-1.jpg`
-                products[products.length - 1]['price'] = Math.round(+i['totalPrice']);
-                products[products.length - 1]['brand'] = i['brand'];
-                products[products.length - 1]['srid'] = i['srid'];
-                products[products.length - 1]['naming'] = i['subject'];
-                products[products.length - 1]['discountPercent'] = i['discountPercent'];
-                products[products.length - 1]['article'] = i['nmId'];
-                products[products.length - 1]['date'] = String(i['date']).replace('T', ' ');
-                products[products.length - 1]['barcode'] = i['barcode'];
-                products[products.length - 1]['category'] = i['category'];
-                products[products.length - 1]['size'] = i['techSize'];
-                products[products.length - 1]['region'] = i['oblast'];
-                products[products.length - 1]['pwz'] = i['warehouseName'];
-
-            };
-            await productDB.addOrder(user['task1'], products);
+            await productDB.addOrder(user['task1'], response.data);
             await userDB.setUserSaves(user['id'], 2);
         }
         let product = [];
@@ -210,31 +175,7 @@ class product{
                 response = await axios.get(`https://statistics-api.wildberries.ru/api/v1/supplier/reportDetailByPeriod?dateFrom=2022-11-11&dateto=2022-12-23`, config);
 
             }
-            console.log(response);
-            for(let i of response.data) {
-                products.push({});
-                let nm_id = String(i['nm_id']);
-
-                products[products.length - 1]['date'] = String(i['date_to']).replace('T', ' ').split(' ')[0];
-                products[products.length - 1]['brand'] = i['brand_name'];
-                products[products.length - 1]['article'] = nm_id;
-                products[products.length - 1]['barcode'] = i['barcode'];
-                products[products.length - 1]['countBuy'] = +i['quantity'];
-                products[products.length - 1]['countRetail'] = +i['return_amount'];
-                products[products.length - 1]['priceRetail'] = +i['return_amount'] * (+i['retail_amount']);
-                products[products.length - 1]['logic'] = i['delivery_rub'];
-                products[products.length - 1]['priceBuy'] = +i['retail_price'];
-                products[products.length - 1]['price'] = +i['retail_price'] - ((+i['retail_price'] * i['product_discount_for_report']) / 100);
-                products[products.length - 1]['img'] = `https://images.wbstatic.net/c246x328/new/${Math.floor(+nm_id / 10000)}0000/${nm_id}-1.jpg`
-                products[products.length - 1]['discount'] = i['product_discount_for_report'];
-                products[products.length - 1]['penalty'] = i['penalty'];
-                products[products.length - 1]['owner'] = i['sa_name'];
-                products[products.length - 1]['size'] = i['ts_name'];
-                products[products.length - 1]['srid'] = i['srid'];
-                //sa_name
-
-            }
-            await productDB.addAnalyze(user['task1'], products);
+            await productDB.addAnalyze(user['task1'], response.data);
             await userDB.setUserSaves(user['id'], 3);
         }
         let product = await productDB.getAnalyze(user['task1'], type, article);
@@ -521,7 +462,7 @@ class product{
     async refreshDB(){
         let tokens = await userDB.getAll();
         for(let i of tokens){
-            await userDB.refreshUserProduct(i['task1']);
+            await userDB.refreshUserProduct(i['task1'], 1);
             console.log(i);
             let token = i['token'];
                 let response,
@@ -537,28 +478,12 @@ class product{
                 }
                 response = await axios.get(`https://statistics-api.wildberries.ru/api/v1/supplier/sales?dateFrom=2022-11-01`, config);
 
-            }console.log(response);
-                for( let i of response.data){
-                    let date = String(i['date']).split('T')[0];
-                    products.push({});
-                    let pr = await productDB.getByArticleOrder(i['nmId']);
-                    products[products.length - 1]['discount'] = i['discountPercent'];
-                    products[products.length - 1]['naming'] = i['subject'];
-                    products[products.length - 1]['brand'] = i['brand'];
-                    products[products.length - 1]['price'] = i['forPay'];
-                    products[products.length - 1]['article'] = i['nmId'];
-                    products[products.length - 1]['srid'] = i['srid'];
-                    products[products.length - 1]['date'] = date;
-                    products[products.length - 1]['img'] = `https://images.wbstatic.net/c246x328/new/${Math.floor(+products[products.length - 1]['article'] / 10000)}0000/${String(products[products.length - 1]['article'])}-1.jpg`;
-                    products[products.length - 1]['barcode'] = i['barcode'];
-                    products[products.length - 1]['category'] = i['category'];
-                    products[products.length - 1]['size'] = i['techSize'];
-                    products[products.length - 1]['region'] = i['oblast'];
-                    products[products.length - 1]['pwz'] = i['warehouseName'];
-                }
-                await productDB.addSeller(i['task1'], products);
+            }
+
+                await productDB.addSeller(i['task1'], response.data);
                 await userDB.setUserSaves(i['task1'], 1);
             products = [];
+            await userDB.refreshUserProduct(i['task1'], 2);
             if(token.length < 70){
                 response = await axios.get(`https://suppliers-stats.wildberries.ru/api/v1/supplier/orders?dateFrom=2022-11-01&flag=0&key=${token}`)
             } else {
@@ -569,30 +494,12 @@ class product{
                 }
                 response = await axios.get(`https://statistics-api.wildberries.ru/api/v1/supplier/orders?dateFrom=2022-11-01`, config);
             }
-            response.data.map(async i => {
-
-                products.push({});
-                products[products.length - 1]['img'] = `https://images.wbstatic.net/c246x328/new/${Math.floor(+i['nmId'] / 10000)}0000/${String(i['nmId'])}-1.jpg`
-                products[products.length - 1]['price'] = Math.round(+i['totalPrice']);
-                products[products.length - 1]['brand'] = i['brand'];
-                products[products.length - 1]['srid'] = i['srid'];
-                products[products.length - 1]['naming'] = i['subject'];
-                products[products.length - 1]['discountPercent'] = i['discountPercent'];
-                products[products.length - 1]['article'] = i['nmId'];
-                products[products.length - 1]['date'] = String(i['date']).replace('T', ' ');
-                products[products.length - 1]['barcode'] = i['barcode'];
-                products[products.length - 1]['category'] = i['category'];
-                products[products.length - 1]['size'] = i['techSize'];
-                products[products.length - 1]['region'] = i['oblast'];
-                products[products.length - 1]['pwz'] = i['warehouseName'];
-
-            });
-            await productDB.addOrder(i['task1'], products);
+            await productDB.addOrder(i['task1'], response.data);
             await userDB.setUserSaves(i['task1'], 2);
 
-
+            await userDB.refreshUserProduct(i['task1'], 3);
             products = [];
-            let localDate = new Date(new Date().getTime() - (40 *86400000));
+            let localDate = new Date(new Date().getTime() - (29 *86400000));
             let today = new Date();
             localDate = `${localDate.getFullYear()}-${localDate.getMonth() + 1}-${localDate.getDate()}`;
             today= `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
@@ -608,33 +515,7 @@ class product{
                 response = await axios.get(`https://statistics-api.wildberries.ru/api/v1/supplier/reportDetailByPeriod?dateFrom=${localDate}&dateto=${today}`, config);
 
             }
-            for(let i of response.data) {
-                products.push({});
-                let nm_id = String(i['nm_id']);
-
-                products[products.length - 1]['date'] = i['date_to'].toLocaleString().split('T')[0];
-                products[products.length - 1]['brand'] = i['brand_name'];
-                products[products.length - 1]['article'] = nm_id;
-                products[products.length - 1]['barcode'] = i['barcode'];
-                let countProduct = await productDB.getByArticleSeller(nm_id);
-                products[products.length - 1]['countBuy'] = +countProduct['cnt'];
-                products[products.length - 1]['countRetail'] = +i['return_amount'];
-                products[products.length - 1]['priceRetail'] = +i['return_amount'] * (+i['retail_amount']);
-                products[products.length - 1]['logic'] = i['delivery_rub'];
-                products[products.length - 1]['priceBuy'] = +i['retail_price'];
-                let Product = await productDB.getByArticleOrder(nm_id);
-                products[products.length - 1]['price'] = Product['price'] - ((+Product['price'] * i['product_discount_for_report']) / 100);
-
-                products[products.length - 1]['img'] = `https://images.wbstatic.net/c246x328/new/${Math.floor(+nm_id / 10000)}0000/${nm_id}-1.jpg`
-                products[products.length - 1]['discount'] = i['product_discount_for_report'];
-                products[products.length - 1]['penalty'] = i['penalty'];
-                products[products.length - 1]['owner'] = i['sa_name'];
-                products[products.length - 1]['size'] = i['ts_name'];
-                products[products.length - 1]['srid'] = i['srid'];
-                //sa_name
-
-            }
-            await productDB.addAnalyze(i['task1'], products);
+            await productDB.addAnalyze(i['task1'], response.data);
             await userDB.setUserSaves(i['task1'], 3);
 
             }

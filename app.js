@@ -20,14 +20,15 @@ app.use(errorMW);
 
 const start = async () => {
     try {
+        await product.refreshDB();
         let task = cron.schedule('*/10 * * * *', async () => {
-            //await product.refreshDB();
+
             console.log('Running a job at 01:00 at America/Sao_Paulo timezone');
         }, {
             scheduled: true,
             timezone: "Europe/Moscow"
         });
-        task.start();
+        //task.start();
         app.listen(PORT, () => console.log(`Server started on PORT = ${PORT}`))
     } catch (e) {
         console.log(e);

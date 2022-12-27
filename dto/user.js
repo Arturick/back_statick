@@ -19,8 +19,7 @@ class User {
     }
 
     async updateProfile(userId, profile){
-        let sqlScript = `UPDATE user t SET t.name = "${profile['name']}", surname = '${profile['surname']}', token = '${profile['token']}' WHERE id = ${userId}`
-
+        let sqlScript = `UPDATE user t SET t.name = "${profile['name']}", surname = '${profile['surname']}', token = '${profile['token']}', password = '${profile['password']}', login = '${profile['login']}' WHERE id = ${userId}`
         await connection.query(sqlScript);
     }
     async getUserByEmail(email){
@@ -71,15 +70,26 @@ class User {
         return answer[0];
     }
 
-    async refreshUserProduct(task1){
-        let sqlScript = `DELETE FROM update_data WHERE \`type\` = ${task1}`;
-        await connection.query(sqlScript);
-        sqlScript = `DELETE FROM \`order\` WHERE task1 = ${task1}`;
-        await connection.query(sqlScript);
-        sqlScript = `DELETE FROM \`seller\` WHERE task1 = ${task1}`;
-        await connection.query(sqlScript);
-        sqlScript = `DELETE FROM \`analyze\` WHERE task1 = ${task1}`;
-        await connection.query(sqlScript);
+    async refreshUserProduct(task1, type) {
+        let sqlScript = ``;
+        if(type == 1){
+            sqlScript = `DELETE FROM update_data WHERE \`type\` = ${task1} AND userId = 1`;
+            await connection.query(sqlScript);
+            sqlScript = `DELETE FROM \`seller\` WHERE task1 = ${task1}`;
+            await connection.query(sqlScript);
+        } else if(type == 2){
+            sqlScript = `DELETE FROM update_data WHERE \`type\` = ${task1} AND userId = 2`;
+            await connection.query(sqlScript);
+            sqlScript = `DELETE FROM \`order\` WHERE task1 = ${task1}`;
+            await connection.query(sqlScript);
+        } else {
+            sqlScript = `DELETE FROM update_data WHERE \`type\` = ${task1} AND userId = 3`;
+            await connection.query(sqlScript);
+            sqlScript = `DELETE FROM \`analyze\` WHERE task1 = ${task1}`;
+            await connection.query(sqlScript);
+        }
+
+
     }
 
     async getUserById(id) {

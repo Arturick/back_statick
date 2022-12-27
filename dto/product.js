@@ -19,7 +19,8 @@ class Product {
         let sqlScript = ``;
         await this.clear(task1, 2);
         for(let i of products){
-            sqlScript = `INSERT INTO \`order\` (brand, task1, article, discount, price, naming, date_seller, retail_price, img, srid, barcode, category, size, region, pwz) VALUES('${i['brand']}', ${task1}, '${i['article']}', '${i['discount']}', '${i['price']}', '${i['naming']}', '${i['date']}', '${i['price']}', '${i['img']}', '${i['srid']}', '${i['barcode']}', '${i['category']}', '${i['size']}', '${i['region']}', '${i['pwz']}')`
+            let img = `https://images.wbstatic.net/c246x328/new/${Math.floor(+i['nmId'] / 10000)}0000/${String(i['nmId'])}-1.jpg`;
+            sqlScript = `INSERT INTO \`order\` (brand, task1, article, discount, price, naming, date_seller, retail_price, img, srid, barcode, category, size, region, pwz) VALUES('${i['brand']}', ${task1}, '${i['nmId']}', '${i['discountPercent']}', '${Math.round(+i['totalPrice'])}', '${i['subject']}', '${String(i['date']).replace('T', ' ')}', '${Math.round(+i['totalPrice'])}', '${img}', '${i['srid']}', '${i['barcode']}', '${i['category']}', '${i['techSize']}', '${i['oblast']}', '${i['warehouseName']}')`
             await connection.query(sqlScript);
 
         }
@@ -31,8 +32,9 @@ class Product {
         let sqlScript = ``;
         await this.clear(task1, 1);
         for(let i of products){
-
-            sqlScript = `INSERT INTO seller (brand, task1, article, discount, price, naming, date_seller, retail_price, img, srid, barcode, category, size, region, pwz) VALUES('${i['brand']}', ${task1}, '${i['article']}', '${i['discount']}', ${i['price']}, '${i['naming']}', '${i['date']}', ${i['price']}, '${i['img']}', '${i['srid']}', '${i['barcode']}', '${i['category']}', '${i['size']}', '${i['region']}', '${i['pwz']}')`
+            let date = String(i['date']).split('T')[0];
+            let img = `https://images.wbstatic.net/c246x328/new/${Math.floor(+i['nmId'] / 10000)}0000/${+i['nmId']}-1.jpg`;
+            sqlScript = `INSERT INTO seller (brand, task1, article, discount, price, naming, date_seller, retail_price, img, srid, barcode, category, size, region, pwz) VALUES('${i['brand']}', ${task1}, '${i['nmId']}', '${i['discountPercent']}', ${i['forPay']}, '${i['subject']}', '${date}', ${i['forPay']}, '${img}', '${i['srid']}', '${i['barcode']}', '${i['category']}', '${i['techSize']}', '${i['oblast']}', '${i['warehouseName']}')`;
             await connection.query(sqlScript);
 
         }
@@ -41,7 +43,9 @@ class Product {
         let sqlScript = ``;
         await this.clear(task1, 3);
         for(let i of products){
-            sqlScript = `INSERT INTO \`analyze\` (brand, task1, article, discount, price, naming, date_report, retail_price, img, count_report, total_price, barcode, size_product, retail_count, logic, com_wb, penalty, owner_article,  count_buy, srid) VALUES('${i['brand']}', ${task1}, '${i['article']}', ${i['discount']}, ${i['price']}, '${i['naming']}', ${i['date']}, ${i['price']}, '${i['img']}', 1, ${i['priceBuy']}, '${i['barcode']}', '${i['size']}',   ${i['countRetail']}, ${i['logic']}, 1000, ${i['penalty']}, '${i['owner']}', ${i['countBuy']}, '${i['srid']}')`;
+            let nm_id = String(i['nm_id']);
+            let img = `https://images.wbstatic.net/c246x328/new/${Math.floor(+nm_id / 10000)}0000/${nm_id}-1.jpg`;
+            sqlScript = `INSERT INTO \`analyze\` (brand, task1, article, discount, price, naming, date_report, retail_price, img, count_report, total_price, barcode, size_product, retail_count, logic, com_wb, penalty, owner_article,  count_buy, srid) VALUES('${i['brand_name']}', ${task1}, '${nm_id}', ${i['product_discount_for_report']}, ${+i['retail_price'] - ((+i['retail_price'] * i['product_discount_for_report']) / 100)}, '${i['naming']}', ${String(i['date_to']).replace('T', ' ').split(' ')[0]}, ${+i['return_amount']}, '${img}', 1, ${+i['retail_price']}, '${i['barcode']}', '${i['ts_name']}',   ${+i['return_amount']}, ${i['delivery_rub']}, 1000, ${i['penalty']}, '${i['sa_name']}', ${+i['quantity']}, '${i['srid']}')`;
             await connection.query(sqlScript);
         }
     }
