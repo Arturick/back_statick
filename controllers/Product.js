@@ -122,9 +122,7 @@ class Product{
 
     async deleteMinus(user, req, res, next){
         try {
-            const {id} = req.body;
-
-            let answer = await service.deleteMinus(id);
+            let answer = await service.deleteMinus(user);
             answer = answerModule.product(answer);
             res.json(answer);
         } catch (e) {
@@ -135,9 +133,8 @@ class Product{
 
     async getMinus(user, req, res, next){
         try {
-            const {task1} = req.body;
 
-            let answer = await service.getMinus(task1);
+            let answer = await service.getMinus(user);
             answer = answerModule.product(answer);
             res.json(answer);
 
@@ -149,9 +146,8 @@ class Product{
 
     async addMinus(user, req, res, next){
         try {
-            const {task1, value, isNumber, allTime, old, naming} = req.body;
-
-            let answer = await service.addMinus(task1, value, isNumber, allTime, old, naming);
+            const {value, isNumber, allTime, old, naming} = req.body;
+            let answer = await service.addMinus(user['task1'], value, isNumber, allTime, old, naming);
             answer = answerModule.product(answer);
             res.json(answer);
 

@@ -521,17 +521,15 @@ class product{
             }
     }
 
-    async getMinus(task1){
-        if(!task1){
-            console.log(403);
-        }
-        let answer = await productDB.getMinus(task1);
+    async getMinus(user){
+
+        let answer = await productDB.getMinus(user['task1']);
 
         return answer;
     }
 
-    async deleteMinus(id){
-        await productDB.deleteMinus(id);
+    async deleteMinus(user){
+        await productDB.deleteMinus(user);
     }
 
     async getAllSellerDiagram(task1){
