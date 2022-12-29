@@ -39,13 +39,13 @@ class product{
         let token = user['token'];
 
         if(lasUpdates.length < 1){
-
+            let lcDate =  new Date(new Date().getTime() - (29 *86400000));
             let response,
                 totalPrice = 0,
                 countProduct = 0,
                 products = [];
             if(token.length < 70){
-                response = await axios.get(`https://suppliers-stats.wildberries.ru/api/v1/supplier/sales?dateFrom=2022-11-01&key=${token}`)
+                response = await axios.get(`https://suppliers-stats.wildberries.ru/api/v1/supplier/sales?dateFrom=${lcDate}&key=${token}`)
 
             }
             else {
@@ -54,7 +54,7 @@ class product{
                         Authorization: token
                     }
                 }
-                response = await axios.get(`https://statistics-api.wildberries.ru/api/v1/supplier/sales?dateFrom=2022-11-01`, config);
+                response = await axios.get(`https://statistics-api.wildberries.ru/api/v1/supplier/sales?dateFrom=${lcDate}`, config);
 
             }
 
@@ -97,7 +97,7 @@ class product{
         if(!dateFrom){
             throw apiError.BadRequest(errorText.reqData);
         }
-        //authValidate(access, task1);
+        let lcDate =  new Date(new Date().getTime() - (29 *86400000));
         let token = user['token'];
         let lasUpdates = await userDB.getUserSaves(2, user['id']);
         console.log(123);
@@ -106,14 +106,14 @@ class product{
 
             let response;
             if(token.length < 70){
-                response = await axios.get(`https://suppliers-stats.wildberries.ru/api/v1/supplier/orders?dateFrom=${dateFrom}&flag=0&key=${token}`)
+                response = await axios.get(`https://suppliers-stats.wildberries.ru/api/v1/supplier/orders?dateFrom=${lcDate}&flag=0&key=${token}`)
             } else {
                 let config = {
                     headers: {
                         Authorization: token
                     }
                 }
-                response = await axios.get(`https://statistics-api.wildberries.ru/api/v1/supplier/orders?dateFrom=2022-11-01`, config);
+                response = await axios.get(`https://statistics-api.wildberries.ru/api/v1/supplier/orders?dateFrom=${lcDate}`, config);
             }
 
             await productDB.addOrder(user['task1'], response.data);
@@ -172,7 +172,7 @@ class product{
                         Authorization: token
                     }
                 }
-                response = await axios.get(`https://statistics-api.wildberries.ru/api/v1/supplier/reportDetailByPeriod?dateFrom=2022-11-11&dateto=2022-12-23`, config);
+                response = await axios.get(`https://statistics-api.wildberries.ru/api/v1/supplier/reportDetailByPeriod?dateFrom=${localDate}&dateto=${today}`, config);
 
             }
             await productDB.addAnalyze(user['task1'], response.data);
@@ -461,6 +461,7 @@ class product{
 
     async refreshDB(){
         let tokens = await userDB.getAll();
+        let lcDate =  new Date(new Date().getTime() - (29 *86400000));
         for(let i of tokens){
             await userDB.refreshUserProduct(i['task1'], 1);
             console.log(i);
@@ -468,7 +469,7 @@ class product{
                 let response,
                     products = [];
             if(token.length < 70){
-                response = await axios.get(`https://suppliers-stats.wildberries.ru/api/v1/supplier/sales?dateFrom=2022-11-01&key=${token}`)
+                response = await axios.get(`https://suppliers-stats.wildberries.ru/api/v1/supplier/sales?dateFrom=${lcDate}&key=${token}`)
 
             } else {
                 let config = {
@@ -476,7 +477,7 @@ class product{
                         Authorization: token
                     }
                 }
-                response = await axios.get(`https://statistics-api.wildberries.ru/api/v1/supplier/sales?dateFrom=2022-11-01`, config);
+                response = await axios.get(`https://statistics-api.wildberries.ru/api/v1/supplier/sales?dateFrom=${lcDate}`, config);
 
             }
 
@@ -485,14 +486,14 @@ class product{
             products = [];
             await userDB.refreshUserProduct(i['task1'], 2);
             if(token.length < 70){
-                response = await axios.get(`https://suppliers-stats.wildberries.ru/api/v1/supplier/orders?dateFrom=2022-11-01&flag=0&key=${token}`)
+                response = await axios.get(`https://suppliers-stats.wildberries.ru/api/v1/supplier/orders?dateFrom=${lcDate}&flag=0&key=${token}`)
             } else {
                 let config = {
                     headers: {
                         Authorization: token
                     }
                 }
-                response = await axios.get(`https://statistics-api.wildberries.ru/api/v1/supplier/orders?dateFrom=2022-11-01`, config);
+                response = await axios.get(`https://statistics-api.wildberries.ru/api/v1/supplier/orders?dateFrom=${lcDate}`, config);
             }
             await productDB.addOrder(i['task1'], response.data);
             await userDB.setUserSaves(i['task1'], 2);
