@@ -146,8 +146,8 @@ class Product{
 
     async addMinus(user, req, res, next){
         try {
-            const {value, isNumber, allTime, old, naming} = req.body;
-            let answer = await service.addMinus(user['task1'], value, isNumber, allTime, old, naming);
+            const {value, isNumber, allTime, old, naming, percent} = req.body;
+            let answer = await service.addMinus(user['task1'], value, isNumber, allTime, old, naming, percent);
             answer = answerModule.product(answer);
             res.json(answer);
 

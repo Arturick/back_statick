@@ -211,8 +211,8 @@ class Product {
         return answer[0];
     }
 
-    async addMinus(task1, value, isNumber, allTime, old, naming){
-        let sqlScript = `INSERT INTO minus(old, date_add, \`value\`, isNumber, allTime, task1, naming) VALUES (${old}, NOW(), ${value}, ${isNumber}, ${allTime}, ${task1}, '${naming}')`;
+    async addMinus(task1, value, isNumber, allTime, old, naming, percent){
+        let sqlScript = `INSERT INTO minus(old, date_add, \`value\`, isNumber, allTime, task1, naming, percent) VALUES (${old}, NOW(), ${value}, ${isNumber}, ${allTime}, ${task1}, '${naming}', ${percent})`;
         let answer = await connection.query(sqlScript);
     }
 

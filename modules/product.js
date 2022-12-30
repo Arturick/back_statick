@@ -565,8 +565,9 @@ class product{
 
     }
 
-    async addMinus(task1, value, isNumber, allTime, old, naming){
-        await productDB.addMinus(task1, value, isNumber, allTime, old, naming);
+    async addMinus(task1, value, isNumber, allTime, old, naming, percent){
+        let pr = percent == 'Да' ? 1 : 0;
+        await productDB.addMinus(task1, value, isNumber, allTime, old, naming, pr);
         return {};
     }
 

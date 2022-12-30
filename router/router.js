@@ -13,7 +13,7 @@ router.post('/get-competition', authMiddleware,  productController.getCompetitio
 router.post('/get-analyze', authMiddleware,  productController.getAnalyze);
 router.post('/get-by-article', authMiddleware,  productController.getByArticle);
 router.post('/abc-analyze', authMiddleware,  productController.abcAnalyze);
-router.post('/get-allEconomy', authMiddleware,  productController.getAllEconomy);
+router.post('/get-all-economy', authMiddleware,  productController.getAllEconomy);
 router.post('/get-minus', authMiddleware,  productController.getMinus);
 router.post('/add-minus', authMiddleware,  productController.addMinus);
 router.post('/delete-minus', authMiddleware,  productController.deleteMinus);
